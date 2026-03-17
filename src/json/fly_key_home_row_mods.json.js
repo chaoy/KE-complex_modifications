@@ -4,10 +4,13 @@ const karabiner = require('../lib/karabiner')
 
 const parameters = {
   to_if_alone_timeout_milliseconds: 300,
-  to_delayed_action_delay_milliseconds: 300,
+  to_delayed_action_delay_milliseconds: 0,
   to_if_held_down_threshold_milliseconds: 0,
   simultaneous_threshold_milliseconds: 300,
-  hrm_to_if_alone_timeout_milliseconds: 250,
+  // Home row mods: key must be held for this duration before modifier activates.
+  // Higher = fewer accidental modifier triggers during fast typing.
+  // Lower = more responsive intentional modifier use. 200ms is a good balance.
+  hrm_to_if_held_down_threshold_milliseconds: 200,
 }
 
 function main() {
@@ -43,8 +46,10 @@ function manipulators(triggerKeyCode) {
     // slash: tap = /?, hold = right_shift
     dualKey('slash', 'slash', 'right_shift'),
 
-    // ===== Section 2: Space tap-then-hold bypass =====
-    spaceTapThenHold(),
+    // ===== Section 2: Fly-key-then-hold bypass =====
+    // After using fly key layer (space hold + release), next space press sends plain spacebar.
+    // This allows apps that use held-space as a shortcut.
+    flyKeyThenHold(),
 
     // ===== Section 3: Fly key combos (space held) =====
 
@@ -165,7 +170,8 @@ function dualKey(input, alone, held_down) {
   ]
 }
 
-// Space trigger: hold activates fly key layer, tap sends space + sets space_tapped_recently
+// Space trigger: hold activates fly key layer, tap sends space.
+// When fly key was used (held), sets fly_key_was_activated so the next space press is plain.
 function triggerKey(triggerKeyCode, variable) {
   return [
     {
@@ -176,23 +182,20 @@ function triggerKey(triggerKeyCode, variable) {
       ],
       to_if_alone: [
         { set_variable: { name: variable, value: 0 } },
-        { set_variable: { name: 'space_tapped_recently', value: 1 } },
         { key_code: triggerKeyCode, halt: true },
       ],
       to_if_held_down: [
         { set_variable: { name: variable, value: 1 } },
+        { set_variable: { name: 'fly_key_was_activated', value: 1 } },
       ],
       to_after_key_up: [
         { set_variable: { name: variable, value: 0 } },
         { key_code: 'vk_none' },
       ],
       to_delayed_action: {
-        to_if_invoked: [
-          { set_variable: { name: 'space_tapped_recently', value: 0 } },
-        ],
+        to_if_invoked: [],
         to_if_canceled: [
           { set_variable: { name: variable, value: 0 } },
-          { set_variable: { name: 'space_tapped_recently', value: 0 } },
           { key_code: triggerKeyCode },
         ],
       },
@@ -205,18 +208,21 @@ function triggerKey(triggerKeyCode, variable) {
   ]
 }
 
-// Space tap-then-hold: if space was recently tapped, next space press sends plain spacebar
-function spaceTapThenHold() {
+// Fly-key-then-hold: after fly key was used (space held + released), next space press
+// sends plain spacebar instead of activating fly key again. This allows apps that use
+// held-space as a shortcut. The flag is cleared on this press, so the subsequent space
+// press will activate fly key normally.
+function flyKeyThenHold() {
   return [
     {
       type: 'basic',
       from: { key_code: 'spacebar', modifiers: { optional: ['any'] } },
       to: [
-        { set_variable: { name: 'space_tapped_recently', value: 0 } },
+        { set_variable: { name: 'fly_key_was_activated', value: 0 } },
         { key_code: 'spacebar' },
       ],
       conditions: [
-        { type: 'variable_if', name: 'space_tapped_recently', value: 1 },
+        { type: 'variable_if', name: 'fly_key_was_activated', value: 1 },
       ],
     },
   ]
@@ -322,19 +328,28 @@ function fourPartTriggerCombo(triggerKeyCode, variable, fromKeyCode, normalTo, t
   ]
 }
 
-// Home row mod: lazy modifier on hold, letter on tap. Disabled when fly key is active.
+// Home row mod: letter on tap/interrupt, modifier on held. Disabled when fly key is active.
+//
+// How it works:
+//   - Key down → Karabiner defers the `to` events (because to_if_held_down exists)
+//   - If another key is pressed before threshold → `to` fires (sends the letter), then
+//     the interrupting key is processed. This handles fast typing with overlapping presses.
+//   - If held past threshold with no interruption → `to_if_held_down` fires (modifier)
+//   - If released before threshold with no interruption → `to` fires (sends the letter)
+//
+// This avoids the lazy modifier problem where overlapping keypresses trigger modifiers.
 function homeRowMod(keyCode, modifier, flyKeyVariable) {
   return [
     {
       type: 'basic',
       from: { key_code: keyCode, modifiers: { optional: ['any'] } },
-      to: [{ key_code: modifier, lazy: true }],
-      to_if_alone: [{ key_code: keyCode }],
+      to: [{ key_code: keyCode }],
+      to_if_held_down: [{ key_code: modifier }],
       conditions: [
         { type: 'variable_unless', name: flyKeyVariable, value: 1 },
       ],
       parameters: {
-        'basic.to_if_alone_timeout_milliseconds': parameters.hrm_to_if_alone_timeout_milliseconds,
+        'basic.to_if_held_down_threshold_milliseconds': parameters.hrm_to_if_held_down_threshold_milliseconds,
       },
     },
   ]

@@ -120,7 +120,7 @@
           "to": [
             {
               "set_variable": {
-                "name": "space_tapped_recently",
+                "name": "fly_key_was_activated",
                 "value": 0
               }
             },
@@ -131,7 +131,7 @@
           "conditions": [
             {
               "type": "variable_if",
-              "name": "space_tapped_recently",
+              "name": "fly_key_was_activated",
               "value": 1
             }
           ]
@@ -3738,12 +3738,6 @@
               }
             },
             {
-              "set_variable": {
-                "name": "space_tapped_recently",
-                "value": 1
-              }
-            },
-            {
               "key_code": "spacebar",
               "halt": true
             }
@@ -3752,6 +3746,12 @@
             {
               "set_variable": {
                 "name": "fly_key",
+                "value": 1
+              }
+            },
+            {
+              "set_variable": {
+                "name": "fly_key_was_activated",
                 "value": 1
               }
             }
@@ -3768,24 +3768,11 @@
             }
           ],
           "to_delayed_action": {
-            "to_if_invoked": [
-              {
-                "set_variable": {
-                  "name": "space_tapped_recently",
-                  "value": 0
-                }
-              }
-            ],
+            "to_if_invoked": [],
             "to_if_canceled": [
               {
                 "set_variable": {
                   "name": "fly_key",
-                  "value": 0
-                }
-              },
-              {
-                "set_variable": {
-                  "name": "space_tapped_recently",
                   "value": 0
                 }
               },
@@ -3796,7 +3783,7 @@
           },
           "parameters": {
             "basic.to_if_alone_timeout_milliseconds": 300,
-            "basic.to_delayed_action_delay_milliseconds": 300,
+            "basic.to_delayed_action_delay_milliseconds": 0,
             "basic.to_if_held_down_threshold_milliseconds": 0
           }
         },
@@ -3812,13 +3799,12 @@
           },
           "to": [
             {
-              "key_code": "left_control",
-              "lazy": true
+              "key_code": "a"
             }
           ],
-          "to_if_alone": [
+          "to_if_held_down": [
             {
-              "key_code": "a"
+              "key_code": "left_control"
             }
           ],
           "conditions": [
@@ -3829,7 +3815,7 @@
             }
           ],
           "parameters": {
-            "basic.to_if_alone_timeout_milliseconds": 250
+            "basic.to_if_held_down_threshold_milliseconds": 200
           }
         },
         {
@@ -3844,13 +3830,12 @@
           },
           "to": [
             {
-              "key_code": "left_option",
-              "lazy": true
+              "key_code": "s"
             }
           ],
-          "to_if_alone": [
+          "to_if_held_down": [
             {
-              "key_code": "s"
+              "key_code": "left_option"
             }
           ],
           "conditions": [
@@ -3861,7 +3846,7 @@
             }
           ],
           "parameters": {
-            "basic.to_if_alone_timeout_milliseconds": 250
+            "basic.to_if_held_down_threshold_milliseconds": 200
           }
         },
         {
@@ -3876,13 +3861,12 @@
           },
           "to": [
             {
-              "key_code": "left_command",
-              "lazy": true
+              "key_code": "d"
             }
           ],
-          "to_if_alone": [
+          "to_if_held_down": [
             {
-              "key_code": "d"
+              "key_code": "left_command"
             }
           ],
           "conditions": [
@@ -3893,7 +3877,7 @@
             }
           ],
           "parameters": {
-            "basic.to_if_alone_timeout_milliseconds": 250
+            "basic.to_if_held_down_threshold_milliseconds": 200
           }
         },
         {
@@ -3908,13 +3892,12 @@
           },
           "to": [
             {
-              "key_code": "left_shift",
-              "lazy": true
+              "key_code": "f"
             }
           ],
-          "to_if_alone": [
+          "to_if_held_down": [
             {
-              "key_code": "f"
+              "key_code": "left_shift"
             }
           ],
           "conditions": [
@@ -3925,7 +3908,7 @@
             }
           ],
           "parameters": {
-            "basic.to_if_alone_timeout_milliseconds": 250
+            "basic.to_if_held_down_threshold_milliseconds": 200
           }
         },
         {
@@ -3940,13 +3923,12 @@
           },
           "to": [
             {
-              "key_code": "right_shift",
-              "lazy": true
+              "key_code": "j"
             }
           ],
-          "to_if_alone": [
+          "to_if_held_down": [
             {
-              "key_code": "j"
+              "key_code": "right_shift"
             }
           ],
           "conditions": [
@@ -3957,7 +3939,7 @@
             }
           ],
           "parameters": {
-            "basic.to_if_alone_timeout_milliseconds": 250
+            "basic.to_if_held_down_threshold_milliseconds": 200
           }
         },
         {
@@ -3972,13 +3954,12 @@
           },
           "to": [
             {
-              "key_code": "right_command",
-              "lazy": true
+              "key_code": "k"
             }
           ],
-          "to_if_alone": [
+          "to_if_held_down": [
             {
-              "key_code": "k"
+              "key_code": "right_command"
             }
           ],
           "conditions": [
@@ -3989,7 +3970,7 @@
             }
           ],
           "parameters": {
-            "basic.to_if_alone_timeout_milliseconds": 250
+            "basic.to_if_held_down_threshold_milliseconds": 200
           }
         },
         {
@@ -4004,13 +3985,12 @@
           },
           "to": [
             {
-              "key_code": "right_option",
-              "lazy": true
+              "key_code": "l"
             }
           ],
-          "to_if_alone": [
+          "to_if_held_down": [
             {
-              "key_code": "l"
+              "key_code": "right_option"
             }
           ],
           "conditions": [
@@ -4021,7 +4001,7 @@
             }
           ],
           "parameters": {
-            "basic.to_if_alone_timeout_milliseconds": 250
+            "basic.to_if_held_down_threshold_milliseconds": 200
           }
         },
         {
@@ -4036,13 +4016,12 @@
           },
           "to": [
             {
-              "key_code": "right_control",
-              "lazy": true
+              "key_code": "semicolon"
             }
           ],
-          "to_if_alone": [
+          "to_if_held_down": [
             {
-              "key_code": "semicolon"
+              "key_code": "right_control"
             }
           ],
           "conditions": [
@@ -4053,7 +4032,7 @@
             }
           ],
           "parameters": {
-            "basic.to_if_alone_timeout_milliseconds": 250
+            "basic.to_if_held_down_threshold_milliseconds": 200
           }
         }
       ]
