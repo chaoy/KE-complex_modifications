@@ -331,22 +331,21 @@ function fourPartTriggerCombo(triggerKeyCode, variable, fromKeyCode, normalTo, t
   ]
 }
 
-// Home row mod: letter on tap/interrupt, modifier on held. Disabled when fly key is active.
+// Home row mod: letter on tap, modifier on held. Disabled when fly key is active.
 //
-// How it works (to_if_alone triggers Karabiner's deferral mechanism):
-//   - Key down → Karabiner DEFERS `to` events (waits to determine tap vs hold)
+// Uses only to_if_alone + to_if_held_down (no `to`):
+//   - Key down → Karabiner defers (waits to determine tap vs hold)
 //   - Released before threshold, no other key → `to_if_alone` fires (letter)
-//   - Another key pressed before threshold → `to` fires (letter), then other key processes
-//   - Held past threshold → `to_if_held_down` fires (modifier), `to_if_alone` canceled
+//   - Held past threshold → `to_if_held_down` fires (modifier)
 //
-// Without to_if_alone, `to` fires immediately on key-down (no deferral), causing
-// the letter to appear before the modifier when held.
+// Note: `to` is intentionally omitted. Including `to` with the letter causes
+// double-character output because `to` fires immediately on key-down while
+// `to_if_alone` fires additionally on key-up.
 function homeRowMod(keyCode, modifier, flyKeyVariable) {
   return [
     {
       type: 'basic',
       from: { key_code: keyCode, modifiers: { optional: ['any'] } },
-      to: [{ key_code: keyCode }],
       to_if_alone: [{ key_code: keyCode }],
       to_if_held_down: [{ key_code: modifier }],
       conditions: [
