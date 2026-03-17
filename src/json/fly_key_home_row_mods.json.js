@@ -11,6 +11,9 @@ const parameters = {
   // Higher = fewer accidental modifier triggers during fast typing.
   // Lower = more responsive intentional modifier use. 200ms is a good balance.
   hrm_to_if_held_down_threshold_milliseconds: 200,
+  // Must be >= hrm_to_if_held_down_threshold so to_if_alone doesn't expire before
+  // to_if_held_down fires. to_if_held_down preempts to_if_alone at threshold time.
+  hrm_to_if_alone_timeout_milliseconds: 1000,
 }
 
 function main() {
@@ -330,25 +333,27 @@ function fourPartTriggerCombo(triggerKeyCode, variable, fromKeyCode, normalTo, t
 
 // Home row mod: letter on tap/interrupt, modifier on held. Disabled when fly key is active.
 //
-// How it works:
-//   - Key down → Karabiner defers the `to` events (because to_if_held_down exists)
-//   - If another key is pressed before threshold → `to` fires (sends the letter), then
-//     the interrupting key is processed. This handles fast typing with overlapping presses.
-//   - If held past threshold with no interruption → `to_if_held_down` fires (modifier)
-//   - If released before threshold with no interruption → `to` fires (sends the letter)
+// How it works (to_if_alone triggers Karabiner's deferral mechanism):
+//   - Key down → Karabiner DEFERS `to` events (waits to determine tap vs hold)
+//   - Released before threshold, no other key → `to_if_alone` fires (letter)
+//   - Another key pressed before threshold → `to` fires (letter), then other key processes
+//   - Held past threshold → `to_if_held_down` fires (modifier), `to_if_alone` canceled
 //
-// This avoids the lazy modifier problem where overlapping keypresses trigger modifiers.
+// Without to_if_alone, `to` fires immediately on key-down (no deferral), causing
+// the letter to appear before the modifier when held.
 function homeRowMod(keyCode, modifier, flyKeyVariable) {
   return [
     {
       type: 'basic',
       from: { key_code: keyCode, modifiers: { optional: ['any'] } },
       to: [{ key_code: keyCode }],
+      to_if_alone: [{ key_code: keyCode }],
       to_if_held_down: [{ key_code: modifier }],
       conditions: [
         { type: 'variable_unless', name: flyKeyVariable, value: 1 },
       ],
       parameters: {
+        'basic.to_if_alone_timeout_milliseconds': parameters.hrm_to_if_alone_timeout_milliseconds,
         'basic.to_if_held_down_threshold_milliseconds': parameters.hrm_to_if_held_down_threshold_milliseconds,
       },
     },
