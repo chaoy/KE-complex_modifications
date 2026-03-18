@@ -333,14 +333,17 @@ function fourPartTriggerCombo(triggerKeyCode, variable, fromKeyCode, normalTo, t
 
 // Home row mod: letter on tap, modifier on held. Disabled when fly key is active.
 //
-// Uses only to_if_alone + to_if_held_down (no `to`):
-//   - Key down → Karabiner defers (waits to determine tap vs hold)
+// Three resolution paths:
 //   - Released before threshold, no other key → `to_if_alone` fires (letter)
 //   - Held past threshold → `to_if_held_down` fires (modifier)
+//   - Another key pressed before threshold → `to_delayed_action.to_if_canceled` fires (letter)
 //
-// Note: `to` is intentionally omitted. Including `to` with the letter causes
-// double-character output because `to` fires immediately on key-down while
-// `to_if_alone` fires additionally on key-up.
+// The to_delayed_action handles the "overlap" typing pattern where a home row key
+// is pressed and released quickly while another key is also pressed. Without it,
+// the first key would be eaten (no output) because to_if_alone is canceled by
+// the interrupting key and to_if_held_down threshold wasn't reached.
+//
+// Note: `to` is intentionally omitted to avoid double-character on single tap.
 function homeRowMod(keyCode, modifier, flyKeyVariable) {
   return [
     {
@@ -348,12 +351,17 @@ function homeRowMod(keyCode, modifier, flyKeyVariable) {
       from: { key_code: keyCode, modifiers: { optional: ['any'] } },
       to_if_alone: [{ key_code: keyCode }],
       to_if_held_down: [{ key_code: modifier }],
+      to_delayed_action: {
+        to_if_invoked: [],
+        to_if_canceled: [{ key_code: keyCode }],
+      },
       conditions: [
         { type: 'variable_unless', name: flyKeyVariable, value: 1 },
       ],
       parameters: {
         'basic.to_if_alone_timeout_milliseconds': parameters.hrm_to_if_alone_timeout_milliseconds,
         'basic.to_if_held_down_threshold_milliseconds': parameters.hrm_to_if_held_down_threshold_milliseconds,
+        'basic.to_delayed_action_delay_milliseconds': parameters.hrm_to_if_held_down_threshold_milliseconds,
       },
     },
   ]

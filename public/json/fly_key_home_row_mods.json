@@ -3807,6 +3807,14 @@
               "key_code": "left_control"
             }
           ],
+          "to_delayed_action": {
+            "to_if_invoked": [],
+            "to_if_canceled": [
+              {
+                "key_code": "a"
+              }
+            ]
+          },
           "conditions": [
             {
               "type": "variable_unless",
@@ -3816,7 +3824,8 @@
           ],
           "parameters": {
             "basic.to_if_alone_timeout_milliseconds": 1000,
-            "basic.to_if_held_down_threshold_milliseconds": 200
+            "basic.to_if_held_down_threshold_milliseconds": 200,
+            "basic.to_delayed_action_delay_milliseconds": 200
           }
         },
         {
@@ -3839,6 +3848,14 @@
               "key_code": "left_option"
             }
           ],
+          "to_delayed_action": {
+            "to_if_invoked": [],
+            "to_if_canceled": [
+              {
+                "key_code": "s"
+              }
+            ]
+          },
           "conditions": [
             {
               "type": "variable_unless",
@@ -3848,7 +3865,8 @@
           ],
           "parameters": {
             "basic.to_if_alone_timeout_milliseconds": 1000,
-            "basic.to_if_held_down_threshold_milliseconds": 200
+            "basic.to_if_held_down_threshold_milliseconds": 200,
+            "basic.to_delayed_action_delay_milliseconds": 200
           }
         },
         {
@@ -3871,6 +3889,14 @@
               "key_code": "left_command"
             }
           ],
+          "to_delayed_action": {
+            "to_if_invoked": [],
+            "to_if_canceled": [
+              {
+                "key_code": "d"
+              }
+            ]
+          },
           "conditions": [
             {
               "type": "variable_unless",
@@ -3880,7 +3906,8 @@
           ],
           "parameters": {
             "basic.to_if_alone_timeout_milliseconds": 1000,
-            "basic.to_if_held_down_threshold_milliseconds": 200
+            "basic.to_if_held_down_threshold_milliseconds": 200,
+            "basic.to_delayed_action_delay_milliseconds": 200
           }
         },
         {
@@ -3903,6 +3930,14 @@
               "key_code": "left_shift"
             }
           ],
+          "to_delayed_action": {
+            "to_if_invoked": [],
+            "to_if_canceled": [
+              {
+                "key_code": "f"
+              }
+            ]
+          },
           "conditions": [
             {
               "type": "variable_unless",
@@ -3912,7 +3947,8 @@
           ],
           "parameters": {
             "basic.to_if_alone_timeout_milliseconds": 1000,
-            "basic.to_if_held_down_threshold_milliseconds": 200
+            "basic.to_if_held_down_threshold_milliseconds": 200,
+            "basic.to_delayed_action_delay_milliseconds": 200
           }
         },
         {
@@ -3935,6 +3971,14 @@
               "key_code": "right_shift"
             }
           ],
+          "to_delayed_action": {
+            "to_if_invoked": [],
+            "to_if_canceled": [
+              {
+                "key_code": "j"
+              }
+            ]
+          },
           "conditions": [
             {
               "type": "variable_unless",
@@ -3944,7 +3988,8 @@
           ],
           "parameters": {
             "basic.to_if_alone_timeout_milliseconds": 1000,
-            "basic.to_if_held_down_threshold_milliseconds": 200
+            "basic.to_if_held_down_threshold_milliseconds": 200,
+            "basic.to_delayed_action_delay_milliseconds": 200
           }
         },
         {
@@ -3967,6 +4012,14 @@
               "key_code": "right_command"
             }
           ],
+          "to_delayed_action": {
+            "to_if_invoked": [],
+            "to_if_canceled": [
+              {
+                "key_code": "k"
+              }
+            ]
+          },
           "conditions": [
             {
               "type": "variable_unless",
@@ -3976,7 +4029,8 @@
           ],
           "parameters": {
             "basic.to_if_alone_timeout_milliseconds": 1000,
-            "basic.to_if_held_down_threshold_milliseconds": 200
+            "basic.to_if_held_down_threshold_milliseconds": 200,
+            "basic.to_delayed_action_delay_milliseconds": 200
           }
         },
         {
@@ -3999,6 +4053,14 @@
               "key_code": "right_option"
             }
           ],
+          "to_delayed_action": {
+            "to_if_invoked": [],
+            "to_if_canceled": [
+              {
+                "key_code": "l"
+              }
+            ]
+          },
           "conditions": [
             {
               "type": "variable_unless",
@@ -4008,7 +4070,8 @@
           ],
           "parameters": {
             "basic.to_if_alone_timeout_milliseconds": 1000,
-            "basic.to_if_held_down_threshold_milliseconds": 200
+            "basic.to_if_held_down_threshold_milliseconds": 200,
+            "basic.to_delayed_action_delay_milliseconds": 200
           }
         },
         {
@@ -4031,6 +4094,14 @@
               "key_code": "right_control"
             }
           ],
+          "to_delayed_action": {
+            "to_if_invoked": [],
+            "to_if_canceled": [
+              {
+                "key_code": "semicolon"
+              }
+            ]
+          },
           "conditions": [
             {
               "type": "variable_unless",
@@ -4040,7 +4111,8 @@
           ],
           "parameters": {
             "basic.to_if_alone_timeout_milliseconds": 1000,
-            "basic.to_if_held_down_threshold_milliseconds": 200
+            "basic.to_if_held_down_threshold_milliseconds": 200,
+            "basic.to_delayed_action_delay_milliseconds": 200
           }
         }
       ]
