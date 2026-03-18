@@ -336,12 +336,20 @@ function fourPartTriggerCombo(triggerKeyCode, variable, fromKeyCode, normalTo, t
 // Three resolution paths:
 //   - Released before threshold, no other key → `to_if_alone` fires (letter)
 //   - Held past threshold → `to_if_held_down` fires (modifier)
-//   - Another key pressed before threshold → `to_delayed_action.to_if_canceled` fires (letter)
+//   - Another key pressed before delay → `to_delayed_action.to_if_canceled` fires (letter)
 //
 // The to_delayed_action handles the "overlap" typing pattern where a home row key
 // is pressed and released quickly while another key is also pressed. Without it,
 // the first key would be eaten (no output) because to_if_alone is canceled by
 // the interrupting key and to_if_held_down threshold wasn't reached.
+//
+// IMPORTANT: to_delayed_action_delay must be SHORT (75ms) to avoid double-fire.
+// Karabiner's to_if_alone does NOT cancel the delayed action timer. With a long
+// delay (e.g. 200ms), a quick tap followed by another key within the window would
+// fire BOTH to_if_alone (on key-up) AND to_if_canceled (on next key-down).
+// 75ms is enough to catch overlapping keypresses during fast typing, but short
+// enough that the tap-then-next-key double-fire scenario is practically impossible
+// (would require full press + release + next key all within 75ms).
 //
 // Note: `to` is intentionally omitted to avoid double-character on single tap.
 function homeRowMod(keyCode, modifier, flyKeyVariable) {
@@ -361,7 +369,7 @@ function homeRowMod(keyCode, modifier, flyKeyVariable) {
       parameters: {
         'basic.to_if_alone_timeout_milliseconds': parameters.hrm_to_if_alone_timeout_milliseconds,
         'basic.to_if_held_down_threshold_milliseconds': parameters.hrm_to_if_held_down_threshold_milliseconds,
-        'basic.to_delayed_action_delay_milliseconds': parameters.hrm_to_if_held_down_threshold_milliseconds,
+        'basic.to_delayed_action_delay_milliseconds': 75,
       },
     },
   ]
