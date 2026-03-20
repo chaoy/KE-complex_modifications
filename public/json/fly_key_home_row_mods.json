@@ -3799,7 +3799,8 @@
           },
           "to_if_alone": [
             {
-              "key_code": "a"
+              "key_code": "a",
+              "halt": true
             }
           ],
           "to_if_held_down": [
@@ -3825,7 +3826,7 @@
           "parameters": {
             "basic.to_if_alone_timeout_milliseconds": 1000,
             "basic.to_if_held_down_threshold_milliseconds": 200,
-            "basic.to_delayed_action_delay_milliseconds": 75
+            "basic.to_delayed_action_delay_milliseconds": 150
           }
         },
         {
@@ -3840,7 +3841,8 @@
           },
           "to_if_alone": [
             {
-              "key_code": "s"
+              "key_code": "s",
+              "halt": true
             }
           ],
           "to_if_held_down": [
@@ -3866,7 +3868,7 @@
           "parameters": {
             "basic.to_if_alone_timeout_milliseconds": 1000,
             "basic.to_if_held_down_threshold_milliseconds": 200,
-            "basic.to_delayed_action_delay_milliseconds": 75
+            "basic.to_delayed_action_delay_milliseconds": 150
           }
         },
         {
@@ -3881,7 +3883,8 @@
           },
           "to_if_alone": [
             {
-              "key_code": "d"
+              "key_code": "d",
+              "halt": true
             }
           ],
           "to_if_held_down": [
@@ -3907,7 +3910,7 @@
           "parameters": {
             "basic.to_if_alone_timeout_milliseconds": 1000,
             "basic.to_if_held_down_threshold_milliseconds": 200,
-            "basic.to_delayed_action_delay_milliseconds": 75
+            "basic.to_delayed_action_delay_milliseconds": 150
           }
         },
         {
@@ -3922,7 +3925,8 @@
           },
           "to_if_alone": [
             {
-              "key_code": "f"
+              "key_code": "f",
+              "halt": true
             }
           ],
           "to_if_held_down": [
@@ -3948,7 +3952,7 @@
           "parameters": {
             "basic.to_if_alone_timeout_milliseconds": 1000,
             "basic.to_if_held_down_threshold_milliseconds": 200,
-            "basic.to_delayed_action_delay_milliseconds": 75
+            "basic.to_delayed_action_delay_milliseconds": 150
           }
         },
         {
@@ -3963,7 +3967,8 @@
           },
           "to_if_alone": [
             {
-              "key_code": "j"
+              "key_code": "j",
+              "halt": true
             }
           ],
           "to_if_held_down": [
@@ -3989,7 +3994,7 @@
           "parameters": {
             "basic.to_if_alone_timeout_milliseconds": 1000,
             "basic.to_if_held_down_threshold_milliseconds": 200,
-            "basic.to_delayed_action_delay_milliseconds": 75
+            "basic.to_delayed_action_delay_milliseconds": 150
           }
         },
         {
@@ -4004,7 +4009,8 @@
           },
           "to_if_alone": [
             {
-              "key_code": "k"
+              "key_code": "k",
+              "halt": true
             }
           ],
           "to_if_held_down": [
@@ -4030,7 +4036,7 @@
           "parameters": {
             "basic.to_if_alone_timeout_milliseconds": 1000,
             "basic.to_if_held_down_threshold_milliseconds": 200,
-            "basic.to_delayed_action_delay_milliseconds": 75
+            "basic.to_delayed_action_delay_milliseconds": 150
           }
         },
         {
@@ -4045,7 +4051,8 @@
           },
           "to_if_alone": [
             {
-              "key_code": "l"
+              "key_code": "l",
+              "halt": true
             }
           ],
           "to_if_held_down": [
@@ -4071,7 +4078,7 @@
           "parameters": {
             "basic.to_if_alone_timeout_milliseconds": 1000,
             "basic.to_if_held_down_threshold_milliseconds": 200,
-            "basic.to_delayed_action_delay_milliseconds": 75
+            "basic.to_delayed_action_delay_milliseconds": 150
           }
         },
         {
@@ -4086,7 +4093,8 @@
           },
           "to_if_alone": [
             {
-              "key_code": "semicolon"
+              "key_code": "semicolon",
+              "halt": true
             }
           ],
           "to_if_held_down": [
@@ -4112,7 +4120,7 @@
           "parameters": {
             "basic.to_if_alone_timeout_milliseconds": 1000,
             "basic.to_if_held_down_threshold_milliseconds": 200,
-            "basic.to_delayed_action_delay_milliseconds": 75
+            "basic.to_delayed_action_delay_milliseconds": 150
           }
         }
       ]
