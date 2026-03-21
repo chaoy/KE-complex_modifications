@@ -212,9 +212,11 @@ function triggerKey(triggerKeyCode, variable) {
 }
 
 // Fly-key-then-hold: after fly key was used (space held + released), next space press
-// sends plain spacebar instead of activating fly key again. This allows apps that use
-// held-space as a shortcut. The flag is cleared on this press, so the subsequent space
-// press will activate fly key normally.
+// behaves as follows:
+//   - Tap: sends plain spacebar (allows apps that use held-space shortcuts)
+//   - Hold: re-activates fly key layer (so back-to-back fly key sessions work)
+// The fly_key_was_activated flag is cleared on this press, so subsequent space presses
+// go through the normal triggerKey path.
 function flyKeyThenHold() {
   return [
     {
@@ -222,11 +224,33 @@ function flyKeyThenHold() {
       from: { key_code: 'spacebar', modifiers: { optional: ['any'] } },
       to: [
         { set_variable: { name: 'fly_key_was_activated', value: 0 } },
-        { key_code: 'spacebar' },
       ],
+      to_if_alone: [
+        { set_variable: { name: 'fly_key', value: 0 } },
+        { key_code: 'spacebar', halt: true },
+      ],
+      to_if_held_down: [
+        { set_variable: { name: 'fly_key', value: 1 } },
+      ],
+      to_after_key_up: [
+        { set_variable: { name: 'fly_key', value: 0 } },
+        { key_code: 'vk_none' },
+      ],
+      to_delayed_action: {
+        to_if_invoked: [],
+        to_if_canceled: [
+          { set_variable: { name: 'fly_key', value: 0 } },
+          { key_code: 'spacebar' },
+        ],
+      },
       conditions: [
         { type: 'variable_if', name: 'fly_key_was_activated', value: 1 },
       ],
+      parameters: {
+        'basic.to_if_alone_timeout_milliseconds': parameters.to_if_alone_timeout_milliseconds,
+        'basic.to_delayed_action_delay_milliseconds': parameters.to_delayed_action_delay_milliseconds,
+        'basic.to_if_held_down_threshold_milliseconds': parameters.to_if_held_down_threshold_milliseconds,
+      },
     },
   ]
 }
