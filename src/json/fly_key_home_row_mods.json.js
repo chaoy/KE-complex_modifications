@@ -6,7 +6,6 @@ const parameters = {
   to_if_alone_timeout_milliseconds: 300,
   to_delayed_action_delay_milliseconds: 0,
   to_if_held_down_threshold_milliseconds: 0,
-  simultaneous_threshold_milliseconds: 300,
   // Home row mods: key must be held for this duration before modifier activates.
   // Higher = fewer accidental modifier triggers during fast typing.
   // Lower = more responsive intentional modifier use. 200ms is a good balance.
@@ -212,11 +211,9 @@ function triggerKey(triggerKeyCode, variable) {
 }
 
 // Fly-key-then-hold: after fly key was used (space held + released), next space press
-// behaves as follows:
-//   - Tap: sends plain spacebar (allows apps that use held-space shortcuts)
-//   - Hold: re-activates fly key layer (so back-to-back fly key sessions work)
-// The fly_key_was_activated flag is cleared on this press, so subsequent space presses
-// go through the normal triggerKey path.
+// sends plain spacebar instead of activating fly key again. This allows apps that use
+// held-space as a shortcut. The flag is cleared on this press, so the subsequent space
+// press will activate fly key normally.
 function flyKeyThenHold() {
   return [
     {
@@ -224,38 +221,20 @@ function flyKeyThenHold() {
       from: { key_code: 'spacebar', modifiers: { optional: ['any'] } },
       to: [
         { set_variable: { name: 'fly_key_was_activated', value: 0 } },
+        { key_code: 'spacebar' },
       ],
-      to_if_alone: [
-        { set_variable: { name: 'fly_key', value: 0 } },
-        { key_code: 'spacebar', halt: true },
-      ],
-      to_if_held_down: [
-        { set_variable: { name: 'fly_key', value: 1 } },
-      ],
-      to_after_key_up: [
-        { set_variable: { name: 'fly_key', value: 0 } },
-        { key_code: 'vk_none' },
-      ],
-      to_delayed_action: {
-        to_if_invoked: [],
-        to_if_canceled: [
-          { set_variable: { name: 'fly_key', value: 0 } },
-          { key_code: 'spacebar' },
-        ],
-      },
       conditions: [
         { type: 'variable_if', name: 'fly_key_was_activated', value: 1 },
       ],
-      parameters: {
-        'basic.to_if_alone_timeout_milliseconds': parameters.to_if_alone_timeout_milliseconds,
-        'basic.to_delayed_action_delay_milliseconds': parameters.to_delayed_action_delay_milliseconds,
-        'basic.to_if_held_down_threshold_milliseconds': parameters.to_if_held_down_threshold_milliseconds,
-      },
     },
   ]
 }
 
-// Two-part fly key combo: variable_if + simultaneous detection
+// Fly key combo: when fly_key variable is active, remap the key.
+// No simultaneous detection needed — triggerKey sets fly_key=1 immediately
+// (to_if_held_down threshold=0), so the variable_if rule catches all combos.
+// Removing simultaneous rules prevents them from buffering space and racing
+// with home row mods for the combo key.
 function twoPartTriggerCombo(triggerKeyCode, variable, fromKeyCode, toKeyCode, toModifiers) {
   return [
     {
@@ -264,33 +243,15 @@ function twoPartTriggerCombo(triggerKeyCode, variable, fromKeyCode, toKeyCode, t
       to: [{ key_code: toKeyCode, modifiers: toModifiers }],
       conditions: [{ type: 'variable_if', name: variable, value: 1 }],
     },
-    {
-      type: 'basic',
-      from: {
-        simultaneous: [{ key_code: triggerKeyCode }, { key_code: fromKeyCode }],
-        simultaneous_options: {
-          key_down_order: 'strict',
-          key_up_order: 'strict_inverse',
-          detect_key_down_uninterruptedly: true,
-          to_after_key_up: [{ set_variable: { name: variable, value: 0 } }],
-        },
-        modifiers: { optional: ['any'] },
-      },
-      to: [
-        { set_variable: { name: variable, value: 1 } },
-        { key_code: toKeyCode, modifiers: toModifiers },
-      ],
-      parameters: {
-        'basic.simultaneous_threshold_milliseconds': parameters.simultaneous_threshold_milliseconds,
-      },
-    },
   ]
 }
 
-// Four-part fly key combo: terminal-aware (different output for terminal vs non-terminal apps)
+// Terminal-aware fly key combo: different output for terminal vs non-terminal apps.
+// Only variable_if rules — see twoPartTriggerCombo comment for why simultaneous
+// rules are not used.
 function fourPartTriggerCombo(triggerKeyCode, variable, fromKeyCode, normalTo, terminalTo) {
   return [
-    // Non-terminal: variable_if
+    // Non-terminal
     {
       type: 'basic',
       from: { key_code: fromKeyCode, modifiers: { optional: ['any'] } },
@@ -300,28 +261,7 @@ function fourPartTriggerCombo(triggerKeyCode, variable, fromKeyCode, normalTo, t
         { type: 'variable_if', name: variable, value: 1 },
       ],
     },
-    // Non-terminal: simultaneous
-    {
-      type: 'basic',
-      from: {
-        simultaneous: [{ key_code: triggerKeyCode }, { key_code: fromKeyCode }],
-        simultaneous_options: {
-          key_down_order: 'strict',
-          key_up_order: 'strict_inverse',
-          detect_key_down_uninterruptedly: true,
-          to_after_key_up: [{ set_variable: { name: variable, value: 0 } }],
-        },
-        modifiers: { optional: ['any'] },
-      },
-      to: [{ set_variable: { name: variable, value: 1 } }].concat(normalTo),
-      parameters: {
-        'basic.simultaneous_threshold_milliseconds': parameters.simultaneous_threshold_milliseconds,
-      },
-      conditions: [
-        { type: 'frontmost_application_unless', bundle_identifiers: karabiner.bundleIdentifiers.terminal },
-      ],
-    },
-    // Terminal: variable_if
+    // Terminal
     {
       type: 'basic',
       from: { key_code: fromKeyCode, modifiers: { optional: ['any'] } },
@@ -329,27 +269,6 @@ function fourPartTriggerCombo(triggerKeyCode, variable, fromKeyCode, normalTo, t
       conditions: [
         { type: 'frontmost_application_if', bundle_identifiers: karabiner.bundleIdentifiers.terminal },
         { type: 'variable_if', name: variable, value: 1 },
-      ],
-    },
-    // Terminal: simultaneous
-    {
-      type: 'basic',
-      from: {
-        simultaneous: [{ key_code: triggerKeyCode }, { key_code: fromKeyCode }],
-        simultaneous_options: {
-          key_down_order: 'strict',
-          key_up_order: 'strict_inverse',
-          detect_key_down_uninterruptedly: true,
-          to_after_key_up: [{ set_variable: { name: variable, value: 0 } }],
-        },
-        modifiers: { optional: ['any'] },
-      },
-      to: [{ set_variable: { name: variable, value: 1 } }].concat(terminalTo),
-      parameters: {
-        'basic.simultaneous_threshold_milliseconds': parameters.simultaneous_threshold_milliseconds,
-      },
-      conditions: [
-        { type: 'frontmost_application_if', bundle_identifiers: karabiner.bundleIdentifiers.terminal },
       ],
     },
   ]
