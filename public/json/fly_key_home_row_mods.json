@@ -120,7 +120,101 @@
           "to": [
             {
               "set_variable": {
+                "name": "fly_key",
+                "value": 0
+              }
+            }
+          ],
+          "to_if_alone": [
+            {
+              "set_variable": {
                 "name": "fly_key_was_activated",
+                "value": 0
+              }
+            },
+            {
+              "set_variable": {
+                "name": "fly_key",
+                "value": 0
+              }
+            },
+            {
+              "set_variable": {
+                "name": "space_tapped_recently",
+                "value": 1
+              }
+            },
+            {
+              "key_code": "spacebar",
+              "halt": true
+            }
+          ],
+          "to_if_held_down": [
+            {
+              "set_variable": {
+                "name": "fly_key",
+                "value": 1
+              }
+            }
+          ],
+          "to_after_key_up": [
+            {
+              "set_variable": {
+                "name": "fly_key",
+                "value": 0
+              }
+            },
+            {
+              "key_code": "vk_none"
+            }
+          ],
+          "to_delayed_action": {
+            "to_if_invoked": [],
+            "to_if_canceled": [
+              {
+                "set_variable": {
+                  "name": "fly_key_was_activated",
+                  "value": 0
+                }
+              },
+              {
+                "set_variable": {
+                  "name": "fly_key",
+                  "value": 0
+                }
+              },
+              {
+                "key_code": "spacebar"
+              }
+            ]
+          },
+          "conditions": [
+            {
+              "type": "variable_if",
+              "name": "fly_key_was_activated",
+              "value": 1
+            }
+          ],
+          "parameters": {
+            "basic.to_if_held_down_threshold_milliseconds": 50,
+            "basic.to_if_alone_timeout_milliseconds": 300,
+            "basic.to_delayed_action_delay_milliseconds": 50
+          }
+        },
+        {
+          "type": "basic",
+          "from": {
+            "key_code": "spacebar",
+            "modifiers": {
+              "optional": [
+                "any"
+              ]
+            }
+          },
+          "to": [
+            {
+              "set_variable": {
+                "name": "space_tapped_recently",
                 "value": 0
               }
             },
@@ -131,7 +225,7 @@
           "conditions": [
             {
               "type": "variable_if",
-              "name": "fly_key_was_activated",
+              "name": "space_tapped_recently",
               "value": 1
             }
           ]
@@ -1488,6 +1582,12 @@
               }
             },
             {
+              "set_variable": {
+                "name": "space_tapped_recently",
+                "value": 1
+              }
+            },
+            {
               "key_code": "spacebar",
               "halt": true
             }
@@ -1533,8 +1633,92 @@
           },
           "parameters": {
             "basic.to_if_alone_timeout_milliseconds": 300,
-            "basic.to_delayed_action_delay_milliseconds": 0,
-            "basic.to_if_held_down_threshold_milliseconds": 0
+            "basic.to_if_held_down_threshold_milliseconds": 100,
+            "basic.to_delayed_action_delay_milliseconds": 100
+          }
+        },
+        {
+          "type": "basic",
+          "from": {
+            "key_code": "f",
+            "modifiers": {
+              "optional": [
+                "any"
+              ]
+            }
+          },
+          "to_if_alone": [
+            {
+              "key_code": "f",
+              "halt": true
+            }
+          ],
+          "to_if_held_down": [
+            {
+              "key_code": "left_shift"
+            }
+          ],
+          "to_delayed_action": {
+            "to_if_invoked": [],
+            "to_if_canceled": [
+              {
+                "key_code": "f"
+              }
+            ]
+          },
+          "conditions": [
+            {
+              "type": "variable_unless",
+              "name": "fly_key",
+              "value": 1
+            }
+          ],
+          "parameters": {
+            "basic.to_if_alone_timeout_milliseconds": 1000,
+            "basic.to_if_held_down_threshold_milliseconds": 250,
+            "basic.to_delayed_action_delay_milliseconds": 150
+          }
+        },
+        {
+          "type": "basic",
+          "from": {
+            "key_code": "j",
+            "modifiers": {
+              "optional": [
+                "any"
+              ]
+            }
+          },
+          "to_if_alone": [
+            {
+              "key_code": "j",
+              "halt": true
+            }
+          ],
+          "to_if_held_down": [
+            {
+              "key_code": "right_shift"
+            }
+          ],
+          "to_delayed_action": {
+            "to_if_invoked": [],
+            "to_if_canceled": [
+              {
+                "key_code": "j"
+              }
+            ]
+          },
+          "conditions": [
+            {
+              "type": "variable_unless",
+              "name": "fly_key",
+              "value": 1
+            }
+          ],
+          "parameters": {
+            "basic.to_if_alone_timeout_milliseconds": 1000,
+            "basic.to_if_held_down_threshold_milliseconds": 250,
+            "basic.to_delayed_action_delay_milliseconds": 150
           }
         },
         {
@@ -1647,90 +1831,6 @@
             "to_if_canceled": [
               {
                 "key_code": "d"
-              }
-            ]
-          },
-          "conditions": [
-            {
-              "type": "variable_unless",
-              "name": "fly_key",
-              "value": 1
-            }
-          ],
-          "parameters": {
-            "basic.to_if_alone_timeout_milliseconds": 1000,
-            "basic.to_if_held_down_threshold_milliseconds": 200,
-            "basic.to_delayed_action_delay_milliseconds": 150
-          }
-        },
-        {
-          "type": "basic",
-          "from": {
-            "key_code": "f",
-            "modifiers": {
-              "optional": [
-                "any"
-              ]
-            }
-          },
-          "to_if_alone": [
-            {
-              "key_code": "f",
-              "halt": true
-            }
-          ],
-          "to_if_held_down": [
-            {
-              "key_code": "left_shift"
-            }
-          ],
-          "to_delayed_action": {
-            "to_if_invoked": [],
-            "to_if_canceled": [
-              {
-                "key_code": "f"
-              }
-            ]
-          },
-          "conditions": [
-            {
-              "type": "variable_unless",
-              "name": "fly_key",
-              "value": 1
-            }
-          ],
-          "parameters": {
-            "basic.to_if_alone_timeout_milliseconds": 1000,
-            "basic.to_if_held_down_threshold_milliseconds": 200,
-            "basic.to_delayed_action_delay_milliseconds": 150
-          }
-        },
-        {
-          "type": "basic",
-          "from": {
-            "key_code": "j",
-            "modifiers": {
-              "optional": [
-                "any"
-              ]
-            }
-          },
-          "to_if_alone": [
-            {
-              "key_code": "j",
-              "halt": true
-            }
-          ],
-          "to_if_held_down": [
-            {
-              "key_code": "right_shift"
-            }
-          ],
-          "to_delayed_action": {
-            "to_if_invoked": [],
-            "to_if_canceled": [
-              {
-                "key_code": "j"
               }
             ]
           },

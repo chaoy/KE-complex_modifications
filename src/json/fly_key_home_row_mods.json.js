@@ -4,14 +4,36 @@ const karabiner = require('../lib/karabiner')
 
 const parameters = {
   to_if_alone_timeout_milliseconds: 300,
-  to_delayed_action_delay_milliseconds: 0,
+  // Dual keys (caps_lock, quote, shifts): threshold for tap vs hold.
   to_if_held_down_threshold_milliseconds: 0,
-  // Home row mods: key must be held for this duration before modifier activates.
-  // Higher = fewer accidental modifier triggers during fast typing.
-  // Lower = more responsive intentional modifier use. 200ms is a good balance.
+
+  // Fly key: space must be held this long before fly key layer activates.
+  // Prevents fast typing overlaps (space-down, letter-down, space-up) from
+  // triggering fly combos. Safe because user's fly key pattern has space
+  // outlasting the combo key — the gap between space-down and combo-key-down
+  // is naturally > 100ms.
+  fly_to_if_held_down_threshold_milliseconds: 100,
+
+  // Fly key continuation: lower threshold for thumb-switch after fly key use.
+  // After a fly key session (space held + combo used), the next space press
+  // uses this shorter threshold to re-enter fly key quickly. Enables the
+  // pattern: left thumb space hold → right hand cursor keys → left thumb
+  // release → right thumb space hold → left hand delete keys.
+  fly_continuation_threshold_milliseconds: 50,
+
+  // HRM non-shift (A/S/D = Ctrl/Opt/Cmd, K/L/; = Cmd/Opt/Ctrl):
+  // Modifier key always outlasts the target key for intentional use.
+  // 200ms threshold prevents accidental modifier triggers during fast typing.
   hrm_to_if_held_down_threshold_milliseconds: 200,
-  // Must be >= hrm_to_if_held_down_threshold so to_if_alone doesn't expire before
-  // to_if_held_down fires. to_if_held_down preempts to_if_alone at threshold time.
+
+  // HRM shift (F/J): higher threshold because shift+letter typing can produce
+  // slight overlaps. The user holds F/J longer for intentional shift use,
+  // so a higher threshold reliably distinguishes shift from fast typing.
+  hrm_shift_to_if_held_down_threshold_milliseconds: 250,
+
+  // Must be >= hrm_*_to_if_held_down_threshold so to_if_alone doesn't expire
+  // before to_if_held_down fires. to_if_held_down preempts to_if_alone at
+  // threshold time.
   hrm_to_if_alone_timeout_milliseconds: 1000,
 }
 
@@ -48,12 +70,19 @@ function manipulators(triggerKeyCode) {
     // slash: tap = /?, hold = right_shift
     dualKey('slash', 'slash', 'right_shift'),
 
-    // ===== Section 2: Fly-key-then-hold bypass =====
-    // After using fly key layer (space hold + release), next space press sends plain spacebar.
-    // This allows apps that use held-space as a shortcut.
-    flyKeyThenHold(),
+    // ===== Section 2: Fly key continuation (thumb-switch support) =====
+    // After using fly key (space hold + combo), the next space press re-enters
+    // fly key with a shorter threshold (50ms vs 100ms) for quick thumb switching.
+    // Space tap clears the continuation state and sends space.
+    flyKeyContinuation(variable),
 
-    // ===== Section 3: Fly key combos (space held) =====
+    // ===== Section 3: Tap-then-hold for apps =====
+    // After a space tap, the next space press sends plain spacebar immediately.
+    // This allows apps that use held-space as a shortcut (pan, unmute, etc).
+    // The flag is cleared on use, so the subsequent space press resumes fly key.
+    tapThenHold(),
+
+    // ===== Section 4: Fly key combos (space held) =====
 
     // -- Misc --
     twoPartTriggerCombo(triggerKeyCode, variable, 'b', 'tab', []),
@@ -141,18 +170,23 @@ function manipulators(triggerKeyCode) {
       [{ key_code: 'right_arrow', modifiers: ['left_command', 'left_shift'] }, { key_code: 'delete_forward' }],
       [{ key_code: 'escape' }, { key_code: 'd', modifiers: ['left_control'] }]),
 
-    // ===== Section 4: Trigger key (space) =====
+    // ===== Section 5: Trigger key (space) =====
     triggerKey(triggerKeyCode, variable),
 
-    // ===== Section 5: Home row mods (disabled during fly key) =====
-    homeRowMod('a', 'left_control', variable),
-    homeRowMod('s', 'left_option', variable),
-    homeRowMod('d', 'left_command', variable),
-    homeRowMod('f', 'left_shift', variable),
-    homeRowMod('j', 'right_shift', variable),
-    homeRowMod('k', 'right_command', variable),
-    homeRowMod('l', 'right_option', variable),
-    homeRowMod('semicolon', 'right_control', variable)
+    // ===== Section 6: Home row mods (disabled during fly key) =====
+    // Shift (F/J): higher threshold (250ms) since shift+letter overlaps are
+    // common during fast typing. The modifier outlasts the target key for
+    // intentional use.
+    homeRowMod('f', 'left_shift', variable, true),
+    homeRowMod('j', 'right_shift', variable, true),
+    // Non-shift (Ctrl/Opt/Cmd): standard threshold (200ms). Modifier always
+    // outlasts the target key for intentional use.
+    homeRowMod('a', 'left_control', variable, false),
+    homeRowMod('s', 'left_option', variable, false),
+    homeRowMod('d', 'left_command', variable, false),
+    homeRowMod('k', 'right_command', variable, false),
+    homeRowMod('l', 'right_option', variable, false),
+    homeRowMod('semicolon', 'right_control', variable, false)
   )
 }
 
@@ -172,8 +206,100 @@ function dualKey(input, alone, held_down) {
   ]
 }
 
-// Space trigger: hold activates fly key layer, tap sends space.
-// When fly key was used (held), sets fly_key_was_activated so the next space press is plain.
+// Fly key continuation: after fly key was used (space held + combo pressed),
+// the next space press re-enters fly key mode with a shorter threshold.
+// This supports the thumb-switch pattern: left space hold → right hand combos
+// → left space release → right space hold → left hand combos.
+//
+// Resolution paths:
+//   - Held past 50ms → re-enter fly key layer (fly_key=1)
+//   - Released before timeout, no other key → tap: clear flag, send space,
+//     set space_tapped_recently for tap-then-hold
+//   - Another key pressed before 50ms → to_if_canceled: clear flag, send
+//     space (fast typing overlap during continuation state)
+//
+// The fly_key_was_activated flag persists through non-space key presses but
+// is cleared on every space tap. In practice: after fly key use, typing a
+// space (word boundary) clears the flag, so the next space hold uses the
+// normal 100ms threshold.
+function flyKeyContinuation(variable) {
+  return [
+    {
+      type: 'basic',
+      from: { key_code: 'spacebar', modifiers: { optional: ['any'] } },
+      to: [
+        { set_variable: { name: variable, value: 0 } },
+      ],
+      to_if_alone: [
+        { set_variable: { name: 'fly_key_was_activated', value: 0 } },
+        { set_variable: { name: variable, value: 0 } },
+        { set_variable: { name: 'space_tapped_recently', value: 1 } },
+        { key_code: 'spacebar', halt: true },
+      ],
+      to_if_held_down: [
+        { set_variable: { name: variable, value: 1 } },
+      ],
+      to_after_key_up: [
+        { set_variable: { name: variable, value: 0 } },
+        { key_code: 'vk_none' },
+      ],
+      to_delayed_action: {
+        to_if_invoked: [],
+        to_if_canceled: [
+          { set_variable: { name: 'fly_key_was_activated', value: 0 } },
+          { set_variable: { name: variable, value: 0 } },
+          { key_code: 'spacebar' },
+        ],
+      },
+      conditions: [
+        { type: 'variable_if', name: 'fly_key_was_activated', value: 1 },
+      ],
+      parameters: {
+        'basic.to_if_held_down_threshold_milliseconds': parameters.fly_continuation_threshold_milliseconds,
+        'basic.to_if_alone_timeout_milliseconds': parameters.to_if_alone_timeout_milliseconds,
+        'basic.to_delayed_action_delay_milliseconds': parameters.fly_continuation_threshold_milliseconds,
+      },
+    },
+  ]
+}
+
+// Tap-then-hold: after a space tap, the next space press sends plain spacebar
+// immediately (via `to`), so held-space shortcuts in apps work (pan, unmute).
+// The flag is cleared on this press, so the subsequent space press resumes
+// normal fly key behavior.
+//
+// The space_tapped_recently flag persists until the next space press. If you
+// tap space during typing and later hold space, you'll get one plain space
+// hold (clearing the flag), then fly key resumes. This is a minor quirk
+// accepted as a trade-off for the simplicity of the mechanism.
+function tapThenHold() {
+  return [
+    {
+      type: 'basic',
+      from: { key_code: 'spacebar', modifiers: { optional: ['any'] } },
+      to: [
+        { set_variable: { name: 'space_tapped_recently', value: 0 } },
+        { key_code: 'spacebar' },
+      ],
+      conditions: [
+        { type: 'variable_if', name: 'space_tapped_recently', value: 1 },
+      ],
+    },
+  ]
+}
+
+// Space trigger: hold activates fly key layer (after threshold), tap sends space.
+//
+// Three resolution paths:
+//   - Held past threshold (100ms) → fly_key=1, fly_key_was_activated=1
+//   - Released before timeout, no other key → tap: space + set
+//     space_tapped_recently for tap-then-hold
+//   - Another key pressed before threshold → to_if_canceled: space character
+//     (fast typing overlap — both space and the key produce normal output)
+//
+// The 100ms threshold prevents fast typing overlaps from triggering fly combos.
+// The user's fly key pattern has space outlasting the combo key, so the
+// natural gap between space-down and combo-key-down exceeds the threshold.
 function triggerKey(triggerKeyCode, variable) {
   return [
     {
@@ -184,6 +310,7 @@ function triggerKey(triggerKeyCode, variable) {
       ],
       to_if_alone: [
         { set_variable: { name: variable, value: 0 } },
+        { set_variable: { name: 'space_tapped_recently', value: 1 } },
         { key_code: triggerKeyCode, halt: true },
       ],
       to_if_held_down: [
@@ -203,38 +330,17 @@ function triggerKey(triggerKeyCode, variable) {
       },
       parameters: {
         'basic.to_if_alone_timeout_milliseconds': parameters.to_if_alone_timeout_milliseconds,
-        'basic.to_delayed_action_delay_milliseconds': parameters.to_delayed_action_delay_milliseconds,
-        'basic.to_if_held_down_threshold_milliseconds': parameters.to_if_held_down_threshold_milliseconds,
+        'basic.to_if_held_down_threshold_milliseconds': parameters.fly_to_if_held_down_threshold_milliseconds,
+        'basic.to_delayed_action_delay_milliseconds': parameters.fly_to_if_held_down_threshold_milliseconds,
       },
     },
   ]
 }
 
-// Fly-key-then-hold: after fly key was used (space held + released), next space press
-// sends plain spacebar instead of activating fly key again. This allows apps that use
-// held-space as a shortcut. The flag is cleared on this press, so the subsequent space
-// press will activate fly key normally.
-function flyKeyThenHold() {
-  return [
-    {
-      type: 'basic',
-      from: { key_code: 'spacebar', modifiers: { optional: ['any'] } },
-      to: [
-        { set_variable: { name: 'fly_key_was_activated', value: 0 } },
-        { key_code: 'spacebar' },
-      ],
-      conditions: [
-        { type: 'variable_if', name: 'fly_key_was_activated', value: 1 },
-      ],
-    },
-  ]
-}
-
 // Fly key combo: when fly_key variable is active, remap the key.
-// No simultaneous detection needed — triggerKey sets fly_key=1 immediately
-// (to_if_held_down threshold=0), so the variable_if rule catches all combos.
-// Removing simultaneous rules prevents them from buffering space and racing
-// with home row mods for the combo key.
+// The fly key layer is activated by triggerKey (after threshold) or
+// flyKeyContinuation (after recent fly key use), so the variable_if
+// condition catches all combos without simultaneous detection.
 function twoPartTriggerCombo(triggerKeyCode, variable, fromKeyCode, toKeyCode, toModifiers) {
   return [
     {
@@ -247,8 +353,6 @@ function twoPartTriggerCombo(triggerKeyCode, variable, fromKeyCode, toKeyCode, t
 }
 
 // Terminal-aware fly key combo: different output for terminal vs non-terminal apps.
-// Only variable_if rules — see twoPartTriggerCombo comment for why simultaneous
-// rules are not used.
 function fourPartTriggerCombo(triggerKeyCode, variable, fromKeyCode, normalTo, terminalTo) {
   return [
     // Non-terminal
@@ -274,12 +378,16 @@ function fourPartTriggerCombo(triggerKeyCode, variable, fromKeyCode, normalTo, t
   ]
 }
 
-// Home row mod: letter on tap, modifier on held. Disabled when fly key is active.
+// Home row mod: letter on tap, modifier on hold. Disabled when fly key is active.
 //
 // Three resolution paths:
 //   - Released before threshold, no other key → `to_if_alone` fires (letter + halt)
 //   - Held past threshold → `to_if_held_down` fires (modifier)
 //   - Another key pressed before delay → `to_delayed_action.to_if_canceled` fires (letter)
+//
+// Split thresholds: shift keys (F/J) use 250ms because shift+letter overlaps
+// are common during fast typing. Non-shift keys (Ctrl/Opt/Cmd) use 200ms
+// because the modifier always outlasts the target key for intentional use.
 //
 // The to_delayed_action handles the "overlap" typing pattern where a home row key
 // is pressed and released quickly while another key is also pressed. Without it,
@@ -288,11 +396,12 @@ function fourPartTriggerCombo(triggerKeyCode, variable, fromKeyCode, normalTo, t
 //
 // `halt: true` in to_if_alone prevents subsequent key events from triggering
 // to_if_canceled after the tap has already been resolved, avoiding double-fire.
-// This allows the delayed action window to be generous (150ms) to catch overlaps
-// without risking duplicate characters on sequential typing.
 //
 // Note: `to` is intentionally omitted to avoid double-character on single tap.
-function homeRowMod(keyCode, modifier, flyKeyVariable) {
+function homeRowMod(keyCode, modifier, flyKeyVariable, isShift) {
+  var threshold = isShift
+    ? parameters.hrm_shift_to_if_held_down_threshold_milliseconds
+    : parameters.hrm_to_if_held_down_threshold_milliseconds
   return [
     {
       type: 'basic',
@@ -308,7 +417,7 @@ function homeRowMod(keyCode, modifier, flyKeyVariable) {
       ],
       parameters: {
         'basic.to_if_alone_timeout_milliseconds': parameters.hrm_to_if_alone_timeout_milliseconds,
-        'basic.to_if_held_down_threshold_milliseconds': parameters.hrm_to_if_held_down_threshold_milliseconds,
+        'basic.to_if_held_down_threshold_milliseconds': threshold,
         'basic.to_delayed_action_delay_milliseconds': 150,
       },
     },
