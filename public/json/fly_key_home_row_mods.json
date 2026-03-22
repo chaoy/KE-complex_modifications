@@ -134,6 +134,12 @@
             },
             {
               "set_variable": {
+                "name": "space_was_held",
+                "value": 0
+              }
+            },
+            {
+              "set_variable": {
                 "name": "fly_key",
                 "value": 0
               }
@@ -173,6 +179,12 @@
               },
               {
                 "set_variable": {
+                  "name": "space_was_held",
+                  "value": 0
+                }
+              },
+              {
+                "set_variable": {
                   "name": "fly_key",
                   "value": 0
                 }
@@ -194,6 +206,35 @@
             "basic.to_if_alone_timeout_milliseconds": 300,
             "basic.to_delayed_action_delay_milliseconds": 50
           }
+        },
+        {
+          "type": "basic",
+          "from": {
+            "key_code": "spacebar",
+            "modifiers": {
+              "optional": [
+                "any"
+              ]
+            }
+          },
+          "to": [
+            {
+              "set_variable": {
+                "name": "space_was_held",
+                "value": 0
+              }
+            },
+            {
+              "key_code": "spacebar"
+            }
+          ],
+          "conditions": [
+            {
+              "type": "variable_if",
+              "name": "space_was_held",
+              "value": 1
+            }
+          ]
         },
         {
           "type": "basic",
@@ -1134,6 +1175,12 @@
               }
             },
             {
+              "set_variable": {
+                "name": "space_was_held",
+                "value": 0
+              }
+            },
+            {
               "key_code": "spacebar",
               "halt": true
             }
@@ -1142,6 +1189,12 @@
             {
               "set_variable": {
                 "name": "fly_key",
+                "value": 1
+              }
+            },
+            {
+              "set_variable": {
+                "name": "space_was_held",
                 "value": 1
               }
             }

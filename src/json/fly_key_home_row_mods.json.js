@@ -72,10 +72,16 @@ function manipulators(triggerKeyCode) {
     // After using a fly key combo (space hold + combo key pressed), the next
     // space press re-enters fly key with a shorter threshold (50ms vs 100ms).
     // Only activates when a combo was actually used (fly_key_was_activated=1),
-    // so plain space hold → release → hold works normally (no continuation).
+    // so plain space hold → release → hold produces space repeat instead.
     flyKeyContinuation(variable),
 
-    // ===== Section 3: Fly key combos (space held) =====
+    // ===== Section 3: Space repeat after unused hold =====
+    // After space was held (fly key activated) but no combo was used, the next
+    // space press sends plain spacebar immediately for auto-repeat. This allows
+    // apps that use held-space (pan, unmute). The flag is cleared on use.
+    spaceRepeatAfterHold(),
+
+    // ===== Section 4: Fly key combos (space held) =====
 
     // -- Misc --
     twoPartTriggerCombo(triggerKeyCode, variable, 'b', 'tab', []),
@@ -188,13 +194,13 @@ function dualKey(input, alone, held_down) {
 // combos → left space release → right space hold → left hand combos.
 //
 // The flag is only set by combo rules (not by space hold alone), so:
-//   - Plain space hold → release → hold = normal trigger (no continuation)
+//   - Plain space hold → release → hold = space repeat (spaceRepeatAfterHold)
 //   - Fly combo used → release → hold = continuation (50ms threshold)
 //
 // Resolution paths:
 //   - Held past 50ms → re-enter fly key layer (fly_key=1)
-//   - Released before timeout, no other key → tap: clear flag, send space
-//   - Another key pressed before 50ms → to_if_canceled: clear flag, send
+//   - Released before timeout, no other key → tap: clear flags, send space
+//   - Another key pressed before 50ms → to_if_canceled: clear flags, send
 //     space (fast typing overlap during continuation state)
 //
 // The flag persists through non-space key presses but is cleared on every
@@ -210,6 +216,7 @@ function flyKeyContinuation(variable) {
       ],
       to_if_alone: [
         { set_variable: { name: 'fly_key_was_activated', value: 0 } },
+        { set_variable: { name: 'space_was_held', value: 0 } },
         { set_variable: { name: variable, value: 0 } },
         { key_code: 'spacebar', halt: true },
       ],
@@ -224,6 +231,7 @@ function flyKeyContinuation(variable) {
         to_if_invoked: [],
         to_if_canceled: [
           { set_variable: { name: 'fly_key_was_activated', value: 0 } },
+          { set_variable: { name: 'space_was_held', value: 0 } },
           { set_variable: { name: variable, value: 0 } },
           { key_code: 'spacebar' },
         ],
@@ -240,21 +248,45 @@ function flyKeyContinuation(variable) {
   ]
 }
 
+// Space repeat after unused hold: when space was held (fly key activated)
+// but no combo was used, the next space press sends plain spacebar via `to`
+// (immediate key-down), so held-space auto-repeats for app shortcuts like
+// pan or unmute. The flag is cleared on use.
+//
+// Priority: flyKeyContinuation (fly_key_was_activated=1) is checked first.
+// If a combo was used, both fly_key_was_activated=1 and space_was_held=1
+// are set, but flyKeyContinuation matches first and handles it.
+function spaceRepeatAfterHold() {
+  return [
+    {
+      type: 'basic',
+      from: { key_code: 'spacebar', modifiers: { optional: ['any'] } },
+      to: [
+        { set_variable: { name: 'space_was_held', value: 0 } },
+        { key_code: 'spacebar' },
+      ],
+      conditions: [
+        { type: 'variable_if', name: 'space_was_held', value: 1 },
+      ],
+    },
+  ]
+}
+
 // Space trigger: hold activates fly key layer (after threshold), tap sends space.
 //
 // Three resolution paths:
-//   - Held past threshold (100ms) → fly_key=1 (layer active)
+//   - Held past threshold (100ms) → fly_key=1, space_was_held=1
 //   - Released before timeout, no other key → tap: space character
 //   - Another key pressed before threshold → to_if_canceled: space character
 //     (fast typing overlap — both space and the key produce normal output)
 //
-// Note: fly_key_was_activated is NOT set here. It is only set by combo rules
-// when a fly key combo is actually used. This ensures that plain space hold
-// → release → hold does not trigger continuation mode.
+// Sets space_was_held=1 when held past threshold. If a combo is used during
+// the hold, combo rules set fly_key_was_activated=1 which takes priority over
+// space_was_held on the next space press (flyKeyContinuation > spaceRepeatAfterHold).
+// If no combo is used, space_was_held=1 routes the next space press to plain
+// spacebar for auto-repeat (apps: pan, unmute).
 //
 // The 100ms threshold prevents fast typing overlaps from triggering fly combos.
-// The user's fly key pattern has space outlasting the combo key, so the
-// natural gap between space-down and combo-key-down exceeds the threshold.
 function triggerKey(triggerKeyCode, variable) {
   return [
     {
@@ -265,10 +297,12 @@ function triggerKey(triggerKeyCode, variable) {
       ],
       to_if_alone: [
         { set_variable: { name: variable, value: 0 } },
+        { set_variable: { name: 'space_was_held', value: 0 } },
         { key_code: triggerKeyCode, halt: true },
       ],
       to_if_held_down: [
         { set_variable: { name: variable, value: 1 } },
+        { set_variable: { name: 'space_was_held', value: 1 } },
       ],
       to_after_key_up: [
         { set_variable: { name: variable, value: 0 } },
