@@ -1,7 +1,5 @@
 // JavaScript should be written in ECMAScript 5.1.
 
-const karabiner = require('../lib/karabiner')
-
 const parameters = {
   to_if_alone_timeout_milliseconds: 300,
   // Dual keys (caps_lock, quote, shifts): threshold for tap vs hold.
@@ -95,29 +93,21 @@ function manipulators(triggerKeyCode) {
     twoPartTriggerCombo(triggerKeyCode, variable, 'j', 'left_arrow', []),
     twoPartTriggerCombo(triggerKeyCode, variable, 'l', 'right_arrow', []),
 
-    // -- Word movement (terminal-aware) --
-    // u = word left: Option+Left / Esc,b
-    fourPartTriggerCombo(triggerKeyCode, variable, 'u',
-      [{ key_code: 'left_arrow', modifiers: ['left_option'] }],
-      [{ key_code: 'escape' }, { key_code: 'b' }]),
-    // o = word right: Option+Right / Esc,f
-    fourPartTriggerCombo(triggerKeyCode, variable, 'o',
-      [{ key_code: 'right_arrow', modifiers: ['left_option'] }],
-      [{ key_code: 'escape' }, { key_code: 'f' }]),
+    // -- Word movement --
+    // u = word left: Option+Left
+    twoPartTriggerCombo(triggerKeyCode, variable, 'u', 'left_arrow', ['left_option']),
+    // o = word right: Option+Right
+    twoPartTriggerCombo(triggerKeyCode, variable, 'o', 'right_arrow', ['left_option']),
 
     // -- Line start/end (Ctrl+A / Ctrl+E) --
     twoPartTriggerCombo(triggerKeyCode, variable, 'h', 'a', ['right_control']),
     twoPartTriggerCombo(triggerKeyCode, variable, 'semicolon', 'e', ['right_control']),
 
-    // -- Line start/end (Cmd+Left / Cmd+Right, terminal-aware) --
-    // y = line start: Cmd+Left / Esc,Ctrl+b
-    fourPartTriggerCombo(triggerKeyCode, variable, 'y',
-      [{ key_code: 'left_arrow', modifiers: ['left_command'] }],
-      [{ key_code: 'escape' }, { key_code: 'b', modifiers: ['right_control'] }]),
-    // p = line end: Cmd+Right / Esc,Ctrl+f
-    fourPartTriggerCombo(triggerKeyCode, variable, 'p',
-      [{ key_code: 'right_arrow', modifiers: ['left_command'] }],
-      [{ key_code: 'escape' }, { key_code: 'f', modifiers: ['right_control'] }]),
+    // -- Line start/end (Cmd+Left / Cmd+Right) --
+    // y = line start: Cmd+Left
+    twoPartTriggerCombo(triggerKeyCode, variable, 'y', 'left_arrow', ['left_command']),
+    // p = line end: Cmd+Right
+    twoPartTriggerCombo(triggerKeyCode, variable, 'p', 'right_arrow', ['left_command']),
 
     // -- Home / Page Up / Page Down / End --
     twoPartTriggerCombo(triggerKeyCode, variable, 'n', 'home', []),
@@ -129,46 +119,35 @@ function manipulators(triggerKeyCode) {
     twoPartTriggerCombo(triggerKeyCode, variable, 'x', 'up_arrow', ['left_command']),
     twoPartTriggerCombo(triggerKeyCode, variable, 'c', 'down_arrow', ['left_command']),
 
-    // -- Option+Up / Option+Down (terminal-aware) --
-    fourPartTriggerCombo(triggerKeyCode, variable, 'q',
-      [{ key_code: 'up_arrow', modifiers: ['left_option'] }],
-      [{ key_code: 'escape' }, { key_code: 'comma', modifiers: ['left_shift'] }]),
-    fourPartTriggerCombo(triggerKeyCode, variable, 'a',
-      [{ key_code: 'down_arrow', modifiers: ['left_option'] }],
-      [{ key_code: 'escape' }, { key_code: 'period', modifiers: ['left_shift'] }]),
+    // -- Option+Up / Option+Down --
+    twoPartTriggerCombo(triggerKeyCode, variable, 'q', 'up_arrow', ['left_option']),
+    twoPartTriggerCombo(triggerKeyCode, variable, 'a', 'down_arrow', ['left_option']),
 
     // -- Delete --
     twoPartTriggerCombo(triggerKeyCode, variable, 'd', 'delete_or_backspace', []),
     twoPartTriggerCombo(triggerKeyCode, variable, 'f', 'delete_forward', []),
 
-    // -- Word delete (terminal-aware) --
-    // e = word delete left: Option+Backspace / Esc,Backspace
-    fourPartTriggerCombo(triggerKeyCode, variable, 'e',
-      [{ key_code: 'delete_or_backspace', modifiers: ['left_option'] }],
-      [{ key_code: 'escape' }, { key_code: 'delete_or_backspace' }]),
-    // r = word delete right: Option+Delete / Esc,d
-    fourPartTriggerCombo(triggerKeyCode, variable, 'r',
-      [{ key_code: 'delete_forward', modifiers: ['left_option'] }],
-      [{ key_code: 'escape' }, { key_code: 'd' }]),
+    // -- Word delete --
+    // e = word delete left: Option+Backspace
+    twoPartTriggerCombo(triggerKeyCode, variable, 'e', 'delete_or_backspace', ['left_option']),
+    // r = word delete right: Option+Delete
+    twoPartTriggerCombo(triggerKeyCode, variable, 'r', 'delete_forward', ['left_option']),
 
-    // -- Line editing (terminal-aware) --
-    // s = select all + kill: Ctrl+Shift+A, Ctrl+K / Ctrl+U
-    fourPartTriggerCombo(triggerKeyCode, variable, 's',
-      [
-        { key_code: 'a', modifiers: ['right_control', 'right_shift'] },
-        { key_code: 'k', modifiers: ['left_control'] },
-      ],
-      [{ key_code: 'u', modifiers: ['left_control'] }]),
+    // -- Line editing --
+    // s = kill entire line: Ctrl+Shift+A (select all on line), Ctrl+K (kill)
+    multiKeyTriggerCombo(triggerKeyCode, variable, 's', [
+      { key_code: 'a', modifiers: ['right_control', 'right_shift'] },
+      { key_code: 'k', modifiers: ['left_control'] },
+    ]),
     // g = kill to end of line: Ctrl+K
     twoPartTriggerCombo(triggerKeyCode, variable, 'g', 'k', ['left_control']),
-    // w = delete to line start: Cmd+Backspace / Ctrl+W
-    fourPartTriggerCombo(triggerKeyCode, variable, 'w',
-      [{ key_code: 'delete_or_backspace', modifiers: ['left_command'] }],
-      [{ key_code: 'w', modifiers: ['left_control'] }]),
-    // t = delete to line end: Cmd+Shift+Right, Delete / Esc, Ctrl+D
-    fourPartTriggerCombo(triggerKeyCode, variable, 't',
-      [{ key_code: 'right_arrow', modifiers: ['left_command', 'left_shift'] }, { key_code: 'delete_forward' }],
-      [{ key_code: 'escape' }, { key_code: 'd', modifiers: ['left_control'] }]),
+    // w = delete to line start: Cmd+Backspace
+    twoPartTriggerCombo(triggerKeyCode, variable, 'w', 'delete_or_backspace', ['left_command']),
+    // t = delete to line end: Cmd+Shift+Right (select to end), Delete
+    multiKeyTriggerCombo(triggerKeyCode, variable, 't', [
+      { key_code: 'right_arrow', modifiers: ['left_command', 'left_shift'] },
+      { key_code: 'delete_forward' },
+    ]),
 
     // ===== Section 5: Trigger key (space) =====
     triggerKey(triggerKeyCode, variable),
@@ -352,28 +331,14 @@ function twoPartTriggerCombo(triggerKeyCode, variable, fromKeyCode, toKeyCode, t
   ]
 }
 
-// Terminal-aware fly key combo: different output for terminal vs non-terminal apps.
-function fourPartTriggerCombo(triggerKeyCode, variable, fromKeyCode, normalTo, terminalTo) {
+// Fly key combo with multiple output keys (e.g., select-then-delete sequences).
+function multiKeyTriggerCombo(triggerKeyCode, variable, fromKeyCode, toEvents) {
   return [
-    // Non-terminal
     {
       type: 'basic',
       from: { key_code: fromKeyCode, modifiers: { optional: ['any'] } },
-      to: normalTo,
-      conditions: [
-        { type: 'frontmost_application_unless', bundle_identifiers: karabiner.bundleIdentifiers.terminal },
-        { type: 'variable_if', name: variable, value: 1 },
-      ],
-    },
-    // Terminal
-    {
-      type: 'basic',
-      from: { key_code: fromKeyCode, modifiers: { optional: ['any'] } },
-      to: terminalTo,
-      conditions: [
-        { type: 'frontmost_application_if', bundle_identifiers: karabiner.bundleIdentifiers.terminal },
-        { type: 'variable_if', name: variable, value: 1 },
-      ],
+      to: toEvents,
+      conditions: [{ type: 'variable_if', name: variable, value: 1 }],
     },
   ]
 }

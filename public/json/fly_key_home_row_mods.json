@@ -418,58 +418,6 @@
           ],
           "conditions": [
             {
-              "type": "frontmost_application_unless",
-              "bundle_identifiers": [
-                "^com\\.apple\\.Terminal$",
-                "^com\\.googlecode\\.iterm2$",
-                "^co\\.zeit\\.hyperterm$",
-                "^co\\.zeit\\.hyper$",
-                "^io\\.alacritty$",
-                "^org\\.alacritty$",
-                "^net\\.kovidgoyal\\.kitty$",
-                "^com\\.mitchellh\\.ghostty$"
-              ]
-            },
-            {
-              "type": "variable_if",
-              "name": "fly_key",
-              "value": 1
-            }
-          ]
-        },
-        {
-          "type": "basic",
-          "from": {
-            "key_code": "u",
-            "modifiers": {
-              "optional": [
-                "any"
-              ]
-            }
-          },
-          "to": [
-            {
-              "key_code": "escape"
-            },
-            {
-              "key_code": "b"
-            }
-          ],
-          "conditions": [
-            {
-              "type": "frontmost_application_if",
-              "bundle_identifiers": [
-                "^com\\.apple\\.Terminal$",
-                "^com\\.googlecode\\.iterm2$",
-                "^co\\.zeit\\.hyperterm$",
-                "^co\\.zeit\\.hyper$",
-                "^io\\.alacritty$",
-                "^org\\.alacritty$",
-                "^net\\.kovidgoyal\\.kitty$",
-                "^com\\.mitchellh\\.ghostty$"
-              ]
-            },
-            {
               "type": "variable_if",
               "name": "fly_key",
               "value": 1
@@ -495,58 +443,6 @@
             }
           ],
           "conditions": [
-            {
-              "type": "frontmost_application_unless",
-              "bundle_identifiers": [
-                "^com\\.apple\\.Terminal$",
-                "^com\\.googlecode\\.iterm2$",
-                "^co\\.zeit\\.hyperterm$",
-                "^co\\.zeit\\.hyper$",
-                "^io\\.alacritty$",
-                "^org\\.alacritty$",
-                "^net\\.kovidgoyal\\.kitty$",
-                "^com\\.mitchellh\\.ghostty$"
-              ]
-            },
-            {
-              "type": "variable_if",
-              "name": "fly_key",
-              "value": 1
-            }
-          ]
-        },
-        {
-          "type": "basic",
-          "from": {
-            "key_code": "o",
-            "modifiers": {
-              "optional": [
-                "any"
-              ]
-            }
-          },
-          "to": [
-            {
-              "key_code": "escape"
-            },
-            {
-              "key_code": "f"
-            }
-          ],
-          "conditions": [
-            {
-              "type": "frontmost_application_if",
-              "bundle_identifiers": [
-                "^com\\.apple\\.Terminal$",
-                "^com\\.googlecode\\.iterm2$",
-                "^co\\.zeit\\.hyperterm$",
-                "^co\\.zeit\\.hyper$",
-                "^io\\.alacritty$",
-                "^org\\.alacritty$",
-                "^net\\.kovidgoyal\\.kitty$",
-                "^com\\.mitchellh\\.ghostty$"
-              ]
-            },
             {
               "type": "variable_if",
               "name": "fly_key",
@@ -626,61 +522,6 @@
           ],
           "conditions": [
             {
-              "type": "frontmost_application_unless",
-              "bundle_identifiers": [
-                "^com\\.apple\\.Terminal$",
-                "^com\\.googlecode\\.iterm2$",
-                "^co\\.zeit\\.hyperterm$",
-                "^co\\.zeit\\.hyper$",
-                "^io\\.alacritty$",
-                "^org\\.alacritty$",
-                "^net\\.kovidgoyal\\.kitty$",
-                "^com\\.mitchellh\\.ghostty$"
-              ]
-            },
-            {
-              "type": "variable_if",
-              "name": "fly_key",
-              "value": 1
-            }
-          ]
-        },
-        {
-          "type": "basic",
-          "from": {
-            "key_code": "y",
-            "modifiers": {
-              "optional": [
-                "any"
-              ]
-            }
-          },
-          "to": [
-            {
-              "key_code": "escape"
-            },
-            {
-              "key_code": "b",
-              "modifiers": [
-                "right_control"
-              ]
-            }
-          ],
-          "conditions": [
-            {
-              "type": "frontmost_application_if",
-              "bundle_identifiers": [
-                "^com\\.apple\\.Terminal$",
-                "^com\\.googlecode\\.iterm2$",
-                "^co\\.zeit\\.hyperterm$",
-                "^co\\.zeit\\.hyper$",
-                "^io\\.alacritty$",
-                "^org\\.alacritty$",
-                "^net\\.kovidgoyal\\.kitty$",
-                "^com\\.mitchellh\\.ghostty$"
-              ]
-            },
-            {
               "type": "variable_if",
               "name": "fly_key",
               "value": 1
@@ -706,61 +547,6 @@
             }
           ],
           "conditions": [
-            {
-              "type": "frontmost_application_unless",
-              "bundle_identifiers": [
-                "^com\\.apple\\.Terminal$",
-                "^com\\.googlecode\\.iterm2$",
-                "^co\\.zeit\\.hyperterm$",
-                "^co\\.zeit\\.hyper$",
-                "^io\\.alacritty$",
-                "^org\\.alacritty$",
-                "^net\\.kovidgoyal\\.kitty$",
-                "^com\\.mitchellh\\.ghostty$"
-              ]
-            },
-            {
-              "type": "variable_if",
-              "name": "fly_key",
-              "value": 1
-            }
-          ]
-        },
-        {
-          "type": "basic",
-          "from": {
-            "key_code": "p",
-            "modifiers": {
-              "optional": [
-                "any"
-              ]
-            }
-          },
-          "to": [
-            {
-              "key_code": "escape"
-            },
-            {
-              "key_code": "f",
-              "modifiers": [
-                "right_control"
-              ]
-            }
-          ],
-          "conditions": [
-            {
-              "type": "frontmost_application_if",
-              "bundle_identifiers": [
-                "^com\\.apple\\.Terminal$",
-                "^com\\.googlecode\\.iterm2$",
-                "^co\\.zeit\\.hyperterm$",
-                "^co\\.zeit\\.hyper$",
-                "^io\\.alacritty$",
-                "^org\\.alacritty$",
-                "^net\\.kovidgoyal\\.kitty$",
-                "^com\\.mitchellh\\.ghostty$"
-              ]
-            },
             {
               "type": "variable_if",
               "name": "fly_key",
@@ -936,61 +722,6 @@
           ],
           "conditions": [
             {
-              "type": "frontmost_application_unless",
-              "bundle_identifiers": [
-                "^com\\.apple\\.Terminal$",
-                "^com\\.googlecode\\.iterm2$",
-                "^co\\.zeit\\.hyperterm$",
-                "^co\\.zeit\\.hyper$",
-                "^io\\.alacritty$",
-                "^org\\.alacritty$",
-                "^net\\.kovidgoyal\\.kitty$",
-                "^com\\.mitchellh\\.ghostty$"
-              ]
-            },
-            {
-              "type": "variable_if",
-              "name": "fly_key",
-              "value": 1
-            }
-          ]
-        },
-        {
-          "type": "basic",
-          "from": {
-            "key_code": "q",
-            "modifiers": {
-              "optional": [
-                "any"
-              ]
-            }
-          },
-          "to": [
-            {
-              "key_code": "escape"
-            },
-            {
-              "key_code": "comma",
-              "modifiers": [
-                "left_shift"
-              ]
-            }
-          ],
-          "conditions": [
-            {
-              "type": "frontmost_application_if",
-              "bundle_identifiers": [
-                "^com\\.apple\\.Terminal$",
-                "^com\\.googlecode\\.iterm2$",
-                "^co\\.zeit\\.hyperterm$",
-                "^co\\.zeit\\.hyper$",
-                "^io\\.alacritty$",
-                "^org\\.alacritty$",
-                "^net\\.kovidgoyal\\.kitty$",
-                "^com\\.mitchellh\\.ghostty$"
-              ]
-            },
-            {
               "type": "variable_if",
               "name": "fly_key",
               "value": 1
@@ -1016,61 +747,6 @@
             }
           ],
           "conditions": [
-            {
-              "type": "frontmost_application_unless",
-              "bundle_identifiers": [
-                "^com\\.apple\\.Terminal$",
-                "^com\\.googlecode\\.iterm2$",
-                "^co\\.zeit\\.hyperterm$",
-                "^co\\.zeit\\.hyper$",
-                "^io\\.alacritty$",
-                "^org\\.alacritty$",
-                "^net\\.kovidgoyal\\.kitty$",
-                "^com\\.mitchellh\\.ghostty$"
-              ]
-            },
-            {
-              "type": "variable_if",
-              "name": "fly_key",
-              "value": 1
-            }
-          ]
-        },
-        {
-          "type": "basic",
-          "from": {
-            "key_code": "a",
-            "modifiers": {
-              "optional": [
-                "any"
-              ]
-            }
-          },
-          "to": [
-            {
-              "key_code": "escape"
-            },
-            {
-              "key_code": "period",
-              "modifiers": [
-                "left_shift"
-              ]
-            }
-          ],
-          "conditions": [
-            {
-              "type": "frontmost_application_if",
-              "bundle_identifiers": [
-                "^com\\.apple\\.Terminal$",
-                "^com\\.googlecode\\.iterm2$",
-                "^co\\.zeit\\.hyperterm$",
-                "^co\\.zeit\\.hyper$",
-                "^io\\.alacritty$",
-                "^org\\.alacritty$",
-                "^net\\.kovidgoyal\\.kitty$",
-                "^com\\.mitchellh\\.ghostty$"
-              ]
-            },
             {
               "type": "variable_if",
               "name": "fly_key",
@@ -1146,58 +822,6 @@
           ],
           "conditions": [
             {
-              "type": "frontmost_application_unless",
-              "bundle_identifiers": [
-                "^com\\.apple\\.Terminal$",
-                "^com\\.googlecode\\.iterm2$",
-                "^co\\.zeit\\.hyperterm$",
-                "^co\\.zeit\\.hyper$",
-                "^io\\.alacritty$",
-                "^org\\.alacritty$",
-                "^net\\.kovidgoyal\\.kitty$",
-                "^com\\.mitchellh\\.ghostty$"
-              ]
-            },
-            {
-              "type": "variable_if",
-              "name": "fly_key",
-              "value": 1
-            }
-          ]
-        },
-        {
-          "type": "basic",
-          "from": {
-            "key_code": "e",
-            "modifiers": {
-              "optional": [
-                "any"
-              ]
-            }
-          },
-          "to": [
-            {
-              "key_code": "escape"
-            },
-            {
-              "key_code": "delete_or_backspace"
-            }
-          ],
-          "conditions": [
-            {
-              "type": "frontmost_application_if",
-              "bundle_identifiers": [
-                "^com\\.apple\\.Terminal$",
-                "^com\\.googlecode\\.iterm2$",
-                "^co\\.zeit\\.hyperterm$",
-                "^co\\.zeit\\.hyper$",
-                "^io\\.alacritty$",
-                "^org\\.alacritty$",
-                "^net\\.kovidgoyal\\.kitty$",
-                "^com\\.mitchellh\\.ghostty$"
-              ]
-            },
-            {
               "type": "variable_if",
               "name": "fly_key",
               "value": 1
@@ -1223,58 +847,6 @@
             }
           ],
           "conditions": [
-            {
-              "type": "frontmost_application_unless",
-              "bundle_identifiers": [
-                "^com\\.apple\\.Terminal$",
-                "^com\\.googlecode\\.iterm2$",
-                "^co\\.zeit\\.hyperterm$",
-                "^co\\.zeit\\.hyper$",
-                "^io\\.alacritty$",
-                "^org\\.alacritty$",
-                "^net\\.kovidgoyal\\.kitty$",
-                "^com\\.mitchellh\\.ghostty$"
-              ]
-            },
-            {
-              "type": "variable_if",
-              "name": "fly_key",
-              "value": 1
-            }
-          ]
-        },
-        {
-          "type": "basic",
-          "from": {
-            "key_code": "r",
-            "modifiers": {
-              "optional": [
-                "any"
-              ]
-            }
-          },
-          "to": [
-            {
-              "key_code": "escape"
-            },
-            {
-              "key_code": "d"
-            }
-          ],
-          "conditions": [
-            {
-              "type": "frontmost_application_if",
-              "bundle_identifiers": [
-                "^com\\.apple\\.Terminal$",
-                "^com\\.googlecode\\.iterm2$",
-                "^co\\.zeit\\.hyperterm$",
-                "^co\\.zeit\\.hyper$",
-                "^io\\.alacritty$",
-                "^org\\.alacritty$",
-                "^net\\.kovidgoyal\\.kitty$",
-                "^com\\.mitchellh\\.ghostty$"
-              ]
-            },
             {
               "type": "variable_if",
               "name": "fly_key",
@@ -1308,58 +880,6 @@
             }
           ],
           "conditions": [
-            {
-              "type": "frontmost_application_unless",
-              "bundle_identifiers": [
-                "^com\\.apple\\.Terminal$",
-                "^com\\.googlecode\\.iterm2$",
-                "^co\\.zeit\\.hyperterm$",
-                "^co\\.zeit\\.hyper$",
-                "^io\\.alacritty$",
-                "^org\\.alacritty$",
-                "^net\\.kovidgoyal\\.kitty$",
-                "^com\\.mitchellh\\.ghostty$"
-              ]
-            },
-            {
-              "type": "variable_if",
-              "name": "fly_key",
-              "value": 1
-            }
-          ]
-        },
-        {
-          "type": "basic",
-          "from": {
-            "key_code": "s",
-            "modifiers": {
-              "optional": [
-                "any"
-              ]
-            }
-          },
-          "to": [
-            {
-              "key_code": "u",
-              "modifiers": [
-                "left_control"
-              ]
-            }
-          ],
-          "conditions": [
-            {
-              "type": "frontmost_application_if",
-              "bundle_identifiers": [
-                "^com\\.apple\\.Terminal$",
-                "^com\\.googlecode\\.iterm2$",
-                "^co\\.zeit\\.hyperterm$",
-                "^co\\.zeit\\.hyper$",
-                "^io\\.alacritty$",
-                "^org\\.alacritty$",
-                "^net\\.kovidgoyal\\.kitty$",
-                "^com\\.mitchellh\\.ghostty$"
-              ]
-            },
             {
               "type": "variable_if",
               "name": "fly_key",
@@ -1413,58 +933,6 @@
           ],
           "conditions": [
             {
-              "type": "frontmost_application_unless",
-              "bundle_identifiers": [
-                "^com\\.apple\\.Terminal$",
-                "^com\\.googlecode\\.iterm2$",
-                "^co\\.zeit\\.hyperterm$",
-                "^co\\.zeit\\.hyper$",
-                "^io\\.alacritty$",
-                "^org\\.alacritty$",
-                "^net\\.kovidgoyal\\.kitty$",
-                "^com\\.mitchellh\\.ghostty$"
-              ]
-            },
-            {
-              "type": "variable_if",
-              "name": "fly_key",
-              "value": 1
-            }
-          ]
-        },
-        {
-          "type": "basic",
-          "from": {
-            "key_code": "w",
-            "modifiers": {
-              "optional": [
-                "any"
-              ]
-            }
-          },
-          "to": [
-            {
-              "key_code": "w",
-              "modifiers": [
-                "left_control"
-              ]
-            }
-          ],
-          "conditions": [
-            {
-              "type": "frontmost_application_if",
-              "bundle_identifiers": [
-                "^com\\.apple\\.Terminal$",
-                "^com\\.googlecode\\.iterm2$",
-                "^co\\.zeit\\.hyperterm$",
-                "^co\\.zeit\\.hyper$",
-                "^io\\.alacritty$",
-                "^org\\.alacritty$",
-                "^net\\.kovidgoyal\\.kitty$",
-                "^com\\.mitchellh\\.ghostty$"
-              ]
-            },
-            {
               "type": "variable_if",
               "name": "fly_key",
               "value": 1
@@ -1494,61 +962,6 @@
             }
           ],
           "conditions": [
-            {
-              "type": "frontmost_application_unless",
-              "bundle_identifiers": [
-                "^com\\.apple\\.Terminal$",
-                "^com\\.googlecode\\.iterm2$",
-                "^co\\.zeit\\.hyperterm$",
-                "^co\\.zeit\\.hyper$",
-                "^io\\.alacritty$",
-                "^org\\.alacritty$",
-                "^net\\.kovidgoyal\\.kitty$",
-                "^com\\.mitchellh\\.ghostty$"
-              ]
-            },
-            {
-              "type": "variable_if",
-              "name": "fly_key",
-              "value": 1
-            }
-          ]
-        },
-        {
-          "type": "basic",
-          "from": {
-            "key_code": "t",
-            "modifiers": {
-              "optional": [
-                "any"
-              ]
-            }
-          },
-          "to": [
-            {
-              "key_code": "escape"
-            },
-            {
-              "key_code": "d",
-              "modifiers": [
-                "left_control"
-              ]
-            }
-          ],
-          "conditions": [
-            {
-              "type": "frontmost_application_if",
-              "bundle_identifiers": [
-                "^com\\.apple\\.Terminal$",
-                "^com\\.googlecode\\.iterm2$",
-                "^co\\.zeit\\.hyperterm$",
-                "^co\\.zeit\\.hyper$",
-                "^io\\.alacritty$",
-                "^org\\.alacritty$",
-                "^net\\.kovidgoyal\\.kitty$",
-                "^com\\.mitchellh\\.ghostty$"
-              ]
-            },
             {
               "type": "variable_if",
               "name": "fly_key",
