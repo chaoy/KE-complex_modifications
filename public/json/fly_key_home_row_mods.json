@@ -139,12 +139,6 @@
               }
             },
             {
-              "set_variable": {
-                "name": "space_tapped_recently",
-                "value": 1
-              }
-            },
-            {
               "key_code": "spacebar",
               "halt": true
             }
@@ -204,7 +198,7 @@
         {
           "type": "basic",
           "from": {
-            "key_code": "spacebar",
+            "key_code": "b",
             "modifiers": {
               "optional": [
                 "any"
@@ -214,33 +208,10 @@
           "to": [
             {
               "set_variable": {
-                "name": "space_tapped_recently",
-                "value": 0
+                "name": "fly_key_was_activated",
+                "value": 1
               }
             },
-            {
-              "key_code": "spacebar"
-            }
-          ],
-          "conditions": [
-            {
-              "type": "variable_if",
-              "name": "space_tapped_recently",
-              "value": 1
-            }
-          ]
-        },
-        {
-          "type": "basic",
-          "from": {
-            "key_code": "b",
-            "modifiers": {
-              "optional": [
-                "any"
-              ]
-            }
-          },
-          "to": [
             {
               "key_code": "tab",
               "modifiers": []
@@ -266,6 +237,12 @@
           },
           "to": [
             {
+              "set_variable": {
+                "name": "fly_key_was_activated",
+                "value": 1
+              }
+            },
+            {
               "key_code": "return_or_enter",
               "modifiers": []
             }
@@ -289,6 +266,12 @@
             }
           },
           "to": [
+            {
+              "set_variable": {
+                "name": "fly_key_was_activated",
+                "value": 1
+              }
+            },
             {
               "key_code": "escape",
               "modifiers": []
@@ -314,6 +297,12 @@
           },
           "to": [
             {
+              "set_variable": {
+                "name": "fly_key_was_activated",
+                "value": 1
+              }
+            },
+            {
               "key_code": "up_arrow",
               "modifiers": []
             }
@@ -337,6 +326,12 @@
             }
           },
           "to": [
+            {
+              "set_variable": {
+                "name": "fly_key_was_activated",
+                "value": 1
+              }
+            },
             {
               "key_code": "down_arrow",
               "modifiers": []
@@ -362,6 +357,12 @@
           },
           "to": [
             {
+              "set_variable": {
+                "name": "fly_key_was_activated",
+                "value": 1
+              }
+            },
+            {
               "key_code": "left_arrow",
               "modifiers": []
             }
@@ -386,6 +387,12 @@
           },
           "to": [
             {
+              "set_variable": {
+                "name": "fly_key_was_activated",
+                "value": 1
+              }
+            },
+            {
               "key_code": "right_arrow",
               "modifiers": []
             }
@@ -409,6 +416,12 @@
             }
           },
           "to": [
+            {
+              "set_variable": {
+                "name": "fly_key_was_activated",
+                "value": 1
+              }
+            },
             {
               "key_code": "left_arrow",
               "modifiers": [
@@ -436,6 +449,12 @@
           },
           "to": [
             {
+              "set_variable": {
+                "name": "fly_key_was_activated",
+                "value": 1
+              }
+            },
+            {
               "key_code": "right_arrow",
               "modifiers": [
                 "left_option"
@@ -461,6 +480,12 @@
             }
           },
           "to": [
+            {
+              "set_variable": {
+                "name": "fly_key_was_activated",
+                "value": 1
+              }
+            },
             {
               "key_code": "a",
               "modifiers": [
@@ -488,6 +513,12 @@
           },
           "to": [
             {
+              "set_variable": {
+                "name": "fly_key_was_activated",
+                "value": 1
+              }
+            },
+            {
               "key_code": "e",
               "modifiers": [
                 "right_control"
@@ -513,6 +544,12 @@
             }
           },
           "to": [
+            {
+              "set_variable": {
+                "name": "fly_key_was_activated",
+                "value": 1
+              }
+            },
             {
               "key_code": "left_arrow",
               "modifiers": [
@@ -540,6 +577,12 @@
           },
           "to": [
             {
+              "set_variable": {
+                "name": "fly_key_was_activated",
+                "value": 1
+              }
+            },
+            {
               "key_code": "right_arrow",
               "modifiers": [
                 "left_command"
@@ -566,6 +609,12 @@
           },
           "to": [
             {
+              "set_variable": {
+                "name": "fly_key_was_activated",
+                "value": 1
+              }
+            },
+            {
               "key_code": "home",
               "modifiers": []
             }
@@ -589,6 +638,12 @@
             }
           },
           "to": [
+            {
+              "set_variable": {
+                "name": "fly_key_was_activated",
+                "value": 1
+              }
+            },
             {
               "key_code": "page_up",
               "modifiers": []
@@ -614,6 +669,12 @@
           },
           "to": [
             {
+              "set_variable": {
+                "name": "fly_key_was_activated",
+                "value": 1
+              }
+            },
+            {
               "key_code": "page_down",
               "modifiers": []
             }
@@ -638,6 +699,12 @@
           },
           "to": [
             {
+              "set_variable": {
+                "name": "fly_key_was_activated",
+                "value": 1
+              }
+            },
+            {
               "key_code": "end",
               "modifiers": []
             }
@@ -661,6 +728,12 @@
             }
           },
           "to": [
+            {
+              "set_variable": {
+                "name": "fly_key_was_activated",
+                "value": 1
+              }
+            },
             {
               "key_code": "up_arrow",
               "modifiers": [
@@ -688,6 +761,12 @@
           },
           "to": [
             {
+              "set_variable": {
+                "name": "fly_key_was_activated",
+                "value": 1
+              }
+            },
+            {
               "key_code": "down_arrow",
               "modifiers": [
                 "left_command"
@@ -713,6 +792,12 @@
             }
           },
           "to": [
+            {
+              "set_variable": {
+                "name": "fly_key_was_activated",
+                "value": 1
+              }
+            },
             {
               "key_code": "up_arrow",
               "modifiers": [
@@ -740,6 +825,12 @@
           },
           "to": [
             {
+              "set_variable": {
+                "name": "fly_key_was_activated",
+                "value": 1
+              }
+            },
+            {
               "key_code": "down_arrow",
               "modifiers": [
                 "left_option"
@@ -766,6 +857,12 @@
           },
           "to": [
             {
+              "set_variable": {
+                "name": "fly_key_was_activated",
+                "value": 1
+              }
+            },
+            {
               "key_code": "delete_or_backspace",
               "modifiers": []
             }
@@ -790,6 +887,12 @@
           },
           "to": [
             {
+              "set_variable": {
+                "name": "fly_key_was_activated",
+                "value": 1
+              }
+            },
+            {
               "key_code": "delete_forward",
               "modifiers": []
             }
@@ -813,6 +916,12 @@
             }
           },
           "to": [
+            {
+              "set_variable": {
+                "name": "fly_key_was_activated",
+                "value": 1
+              }
+            },
             {
               "key_code": "delete_or_backspace",
               "modifiers": [
@@ -840,6 +949,12 @@
           },
           "to": [
             {
+              "set_variable": {
+                "name": "fly_key_was_activated",
+                "value": 1
+              }
+            },
+            {
               "key_code": "delete_forward",
               "modifiers": [
                 "left_option"
@@ -865,6 +980,12 @@
             }
           },
           "to": [
+            {
+              "set_variable": {
+                "name": "fly_key_was_activated",
+                "value": 1
+              }
+            },
             {
               "key_code": "a",
               "modifiers": [
@@ -899,6 +1020,12 @@
           },
           "to": [
             {
+              "set_variable": {
+                "name": "fly_key_was_activated",
+                "value": 1
+              }
+            },
+            {
               "key_code": "k",
               "modifiers": [
                 "left_control"
@@ -925,6 +1052,12 @@
           },
           "to": [
             {
+              "set_variable": {
+                "name": "fly_key_was_activated",
+                "value": 1
+              }
+            },
+            {
               "key_code": "delete_or_backspace",
               "modifiers": [
                 "left_command"
@@ -950,6 +1083,12 @@
             }
           },
           "to": [
+            {
+              "set_variable": {
+                "name": "fly_key_was_activated",
+                "value": 1
+              }
+            },
             {
               "key_code": "right_arrow",
               "modifiers": [
@@ -995,12 +1134,6 @@
               }
             },
             {
-              "set_variable": {
-                "name": "space_tapped_recently",
-                "value": 1
-              }
-            },
-            {
               "key_code": "spacebar",
               "halt": true
             }
@@ -1009,12 +1142,6 @@
             {
               "set_variable": {
                 "name": "fly_key",
-                "value": 1
-              }
-            },
-            {
-              "set_variable": {
-                "name": "fly_key_was_activated",
                 "value": 1
               }
             }

@@ -69,18 +69,13 @@ function manipulators(triggerKeyCode) {
     dualKey('slash', 'slash', 'right_shift'),
 
     // ===== Section 2: Fly key continuation (thumb-switch support) =====
-    // After using fly key (space hold + combo), the next space press re-enters
-    // fly key with a shorter threshold (50ms vs 100ms) for quick thumb switching.
-    // Space tap clears the continuation state and sends space.
+    // After using a fly key combo (space hold + combo key pressed), the next
+    // space press re-enters fly key with a shorter threshold (50ms vs 100ms).
+    // Only activates when a combo was actually used (fly_key_was_activated=1),
+    // so plain space hold → release → hold works normally (no continuation).
     flyKeyContinuation(variable),
 
-    // ===== Section 3: Tap-then-hold for apps =====
-    // After a space tap, the next space press sends plain spacebar immediately.
-    // This allows apps that use held-space as a shortcut (pan, unmute, etc).
-    // The flag is cleared on use, so the subsequent space press resumes fly key.
-    tapThenHold(),
-
-    // ===== Section 4: Fly key combos (space held) =====
+    // ===== Section 3: Fly key combos (space held) =====
 
     // -- Misc --
     twoPartTriggerCombo(triggerKeyCode, variable, 'b', 'tab', []),
@@ -185,22 +180,26 @@ function dualKey(input, alone, held_down) {
   ]
 }
 
-// Fly key continuation: after fly key was used (space held + combo pressed),
-// the next space press re-enters fly key mode with a shorter threshold.
-// This supports the thumb-switch pattern: left space hold → right hand combos
-// → left space release → right space hold → left hand combos.
+// Fly key continuation: after a fly combo was actually used (space held +
+// combo key pressed, which sets fly_key_was_activated=1), the next space
+// press re-enters fly key mode with a shorter threshold (50ms vs 100ms).
+//
+// This supports the thumb-switch pattern: left space hold → right hand
+// combos → left space release → right space hold → left hand combos.
+//
+// The flag is only set by combo rules (not by space hold alone), so:
+//   - Plain space hold → release → hold = normal trigger (no continuation)
+//   - Fly combo used → release → hold = continuation (50ms threshold)
 //
 // Resolution paths:
 //   - Held past 50ms → re-enter fly key layer (fly_key=1)
-//   - Released before timeout, no other key → tap: clear flag, send space,
-//     set space_tapped_recently for tap-then-hold
+//   - Released before timeout, no other key → tap: clear flag, send space
 //   - Another key pressed before 50ms → to_if_canceled: clear flag, send
 //     space (fast typing overlap during continuation state)
 //
-// The fly_key_was_activated flag persists through non-space key presses but
-// is cleared on every space tap. In practice: after fly key use, typing a
-// space (word boundary) clears the flag, so the next space hold uses the
-// normal 100ms threshold.
+// The flag persists through non-space key presses but is cleared on every
+// space tap. In practice: after fly combo use, typing a space (word boundary)
+// clears the flag, so the next space hold uses the normal 100ms threshold.
 function flyKeyContinuation(variable) {
   return [
     {
@@ -212,7 +211,6 @@ function flyKeyContinuation(variable) {
       to_if_alone: [
         { set_variable: { name: 'fly_key_was_activated', value: 0 } },
         { set_variable: { name: variable, value: 0 } },
-        { set_variable: { name: 'space_tapped_recently', value: 1 } },
         { key_code: 'spacebar', halt: true },
       ],
       to_if_held_down: [
@@ -242,39 +240,17 @@ function flyKeyContinuation(variable) {
   ]
 }
 
-// Tap-then-hold: after a space tap, the next space press sends plain spacebar
-// immediately (via `to`), so held-space shortcuts in apps work (pan, unmute).
-// The flag is cleared on this press, so the subsequent space press resumes
-// normal fly key behavior.
-//
-// The space_tapped_recently flag persists until the next space press. If you
-// tap space during typing and later hold space, you'll get one plain space
-// hold (clearing the flag), then fly key resumes. This is a minor quirk
-// accepted as a trade-off for the simplicity of the mechanism.
-function tapThenHold() {
-  return [
-    {
-      type: 'basic',
-      from: { key_code: 'spacebar', modifiers: { optional: ['any'] } },
-      to: [
-        { set_variable: { name: 'space_tapped_recently', value: 0 } },
-        { key_code: 'spacebar' },
-      ],
-      conditions: [
-        { type: 'variable_if', name: 'space_tapped_recently', value: 1 },
-      ],
-    },
-  ]
-}
-
 // Space trigger: hold activates fly key layer (after threshold), tap sends space.
 //
 // Three resolution paths:
-//   - Held past threshold (100ms) → fly_key=1, fly_key_was_activated=1
-//   - Released before timeout, no other key → tap: space + set
-//     space_tapped_recently for tap-then-hold
+//   - Held past threshold (100ms) → fly_key=1 (layer active)
+//   - Released before timeout, no other key → tap: space character
 //   - Another key pressed before threshold → to_if_canceled: space character
 //     (fast typing overlap — both space and the key produce normal output)
+//
+// Note: fly_key_was_activated is NOT set here. It is only set by combo rules
+// when a fly key combo is actually used. This ensures that plain space hold
+// → release → hold does not trigger continuation mode.
 //
 // The 100ms threshold prevents fast typing overlaps from triggering fly combos.
 // The user's fly key pattern has space outlasting the combo key, so the
@@ -289,12 +265,10 @@ function triggerKey(triggerKeyCode, variable) {
       ],
       to_if_alone: [
         { set_variable: { name: variable, value: 0 } },
-        { set_variable: { name: 'space_tapped_recently', value: 1 } },
         { key_code: triggerKeyCode, halt: true },
       ],
       to_if_held_down: [
         { set_variable: { name: variable, value: 1 } },
-        { set_variable: { name: 'fly_key_was_activated', value: 1 } },
       ],
       to_after_key_up: [
         { set_variable: { name: variable, value: 0 } },
@@ -317,27 +291,30 @@ function triggerKey(triggerKeyCode, variable) {
 }
 
 // Fly key combo: when fly_key variable is active, remap the key.
-// The fly key layer is activated by triggerKey (after threshold) or
-// flyKeyContinuation (after recent fly key use), so the variable_if
-// condition catches all combos without simultaneous detection.
+// Also sets fly_key_was_activated=1 so that flyKeyContinuation can detect
+// that a combo was actually used (not just space held without any combo).
 function twoPartTriggerCombo(triggerKeyCode, variable, fromKeyCode, toKeyCode, toModifiers) {
   return [
     {
       type: 'basic',
       from: { key_code: fromKeyCode, modifiers: { optional: ['any'] } },
-      to: [{ key_code: toKeyCode, modifiers: toModifiers }],
+      to: [
+        { set_variable: { name: 'fly_key_was_activated', value: 1 } },
+        { key_code: toKeyCode, modifiers: toModifiers },
+      ],
       conditions: [{ type: 'variable_if', name: variable, value: 1 }],
     },
   ]
 }
 
 // Fly key combo with multiple output keys (e.g., select-then-delete sequences).
+// Also sets fly_key_was_activated=1 for continuation support.
 function multiKeyTriggerCombo(triggerKeyCode, variable, fromKeyCode, toEvents) {
   return [
     {
       type: 'basic',
       from: { key_code: fromKeyCode, modifiers: { optional: ['any'] } },
-      to: toEvents,
+      to: [{ set_variable: { name: 'fly_key_was_activated', value: 1 } }].concat(toEvents),
       conditions: [{ type: 'variable_if', name: variable, value: 1 }],
     },
   ]
